@@ -27,7 +27,7 @@ void Map::fill(unsigned ax, unsigned ay, unsigned bx, unsigned by,
   }
 }
 
-void paintmap(unsigned ax, unsigned ay, const Map &map) {
+void mvprintmap(unsigned ax, unsigned ay, const Map &map) {
   for (unsigned y = 0; y < map.height; ++y) {
     for (unsigned x = 0; x < map.width; ++x) {
       mvprintw(ay + y, ax + x * 2, "%02u", map[y][x]);
@@ -35,8 +35,8 @@ void paintmap(unsigned ax, unsigned ay, const Map &map) {
   }
 }
 
-void rangepaintmap(unsigned ax, unsigned ay, unsigned x, unsigned y,
-                   unsigned width, unsigned height, const Map &map) {
+void mvprintmaprange(unsigned ax, unsigned ay, unsigned x, unsigned y,
+                     unsigned width, unsigned height, const Map &map) {
   for (unsigned i = 0; i < height; ++i) {
     for (unsigned j = 0; j < width; ++j) {
       mvprintw(ay + y + i, ax + (x + j) * 2, "%02u", map[y + i][x + j]);
