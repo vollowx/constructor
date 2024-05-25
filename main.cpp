@@ -1,47 +1,108 @@
 #include "map.h"
+#include "save.h"
 #include <ncurses.h>
 
-int main(int argc, char *argv[]) {
+#define KEY_CTRL(c) ((c) & 0x1f)
+
+#define clearline(y)                                                           \
+  do {                                                                         \
+    move(y, 0);                                                                \
+    clrtoeol();                                                                \
+  } while (0)
+
+const int MAPWIN_HEIGHT = 18;
+const int MAPWIN_WIDTH = 66;
+
+int main() {
+  srand(time(0));
+
   initscr();
   cbreak();
   noecho();
-  keypad(stdscr, TRUE);
+  keypad(stdscr, true);
+  raw();
 
-  Map map(32, 16);
+  curs_set(false);
 
-  int ax = (COLS - map.width * 2) / 2;
-  int ay = (LINES - map.height) / 2;
+  start_color();
+  use_default_colors();
 
-  mvprintmap(ax, ay, map);
+  Save save(32, 16);
 
-  mvprintw(0, 0, "Press `n` to render something new.");
+  int ax, ay;
 
-  while (getch() != 'n')
-    ;
+  ax = (COLS - MAPWIN_WIDTH) / 2;
+  ay = (LINES - MAPWIN_HEIGHT) / 2;
 
-  map.reset();
-  map.fill(5, 5, 15, 15, 11);
-  map.fill(10, 0, 12, 1, 77);
+  WINDOW *mapwin = newwin(MAPWIN_HEIGHT, MAPWIN_WIDTH, ay, ax);
+  box(mapwin, 0, 0);
+  mvwprintw(mapwin, 0, 2, "Map");
+  mvwprintmap(mapwin, 1, 1, save.map);
 
-  mvprintmaprange(ax, ay, 5, 5, 10, 10, map);
-  mvprintmaprange(ax, ay, 10, 0, 2, 1, map);
+  while (true) {
+    refresh();
+    wrefresh(mapwin);
 
-  mvprintw(1, 0,
-           "This is the power of range rendering! Press `n` to fully "
-           "rerender.");
+    int input = getch();
+    bool quit = false;
 
-  while (getch() != 'n')
-    ;
+    clearline(LINES - 1);
+    mvprintw(0, 0, "Just received %d", input);
+    clrtoeol();
 
-  mvprintmap(ax, ay, map);
+    switch (input) {
+    case KEY_CTRL('c'):
+      quit = true;
 
-  mvprintw(2, 0,
-           "Yes, they're the same if use range rendering properly. Press `n` "
-           "to quit.");
+    case KEY_RESIZE:
+      touchline(stdscr, ay, MAPWIN_HEIGHT);
+      ax = (COLS - MAPWIN_WIDTH) / 2;
+      ay = (LINES - MAPWIN_HEIGHT) / 2;
+      if (OK != mvwin(mapwin, ay, ax))
+        mvprintw(1, 0, "Error moving window <%p>", (void *)mapwin);
+      else
+        clearline(1);
+      break;
 
-  refresh();
-  getch();
+    case KEY_CTRL('o'):
+      save.load("save.dat");
+      mvwprintmap(mapwin, 1, 1, save.map);
+      break;
 
+    case KEY_CTRL('s'):
+      save.save("save.dat");
+      break;
+
+    case 'r':
+      save.map.reset();
+      mvwprintmap(mapwin, 1, 1, save.map);
+
+      mvprintw(LINES - 1, 0, "Map reset");
+
+      break;
+
+    case 'a':
+      int rw = rand() % (save.map.width / 2);
+      int rh = rand() % (save.map.height / 2);
+
+      int rx = rand() % (save.map.width - rw + 1);
+      int ry = rand() % (save.map.height - rh + 1);
+
+      int rn = (rand() % 9) * 11;
+
+      save.map.fill(rx, ry, rw, rh, rn);
+      mvwprintmaprange(mapwin, 1, 1, rx, ry, rw, rh, save.map);
+
+      mvprintw(LINES - 1, 0, "Something is added randomly to map");
+
+      break;
+    }
+
+    if (quit)
+      break;
+  }
+
+  delwin(mapwin);
   endwin();
 
   return 0;

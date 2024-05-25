@@ -1,8 +1,8 @@
-CC=g++
+CC=clang++
 CFLAGS=-Wall -Wextra -std=c++11
 LIBS=-lncurses
 
-SRC=main.cpp map.cpp
+SRC=main.cpp map.cpp save.cpp
 
 all: constructor
 

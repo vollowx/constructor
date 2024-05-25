@@ -18,10 +18,10 @@ void Map::reset() {
   }
 }
 
-void Map::fill(unsigned ax, unsigned ay, unsigned bx, unsigned by,
+void Map::fill(unsigned ax, unsigned ay, unsigned width, unsigned height,
                unsigned btype) {
-  for (unsigned y = ay; y < by; ++y) {
-    for (unsigned x = ax; x < bx; ++x) {
+  for (unsigned y = ay; y < ay + height; ++y) {
+    for (unsigned x = ax; x < ax + width; ++x) {
       data[y][x] = btype;
     }
   }
@@ -40,6 +40,25 @@ void mvprintmaprange(unsigned ax, unsigned ay, unsigned x, unsigned y,
   for (unsigned i = 0; i < height; ++i) {
     for (unsigned j = 0; j < width; ++j) {
       mvprintw(ay + y + i, ax + (x + j) * 2, "%02u", map[y + i][x + j]);
+    }
+  }
+}
+
+void mvwprintmap(WINDOW *window, unsigned ax, unsigned ay, const Map &map) {
+  for (unsigned y = 0; y < map.height; ++y) {
+    for (unsigned x = 0; x < map.width; ++x) {
+      mvwprintw(window, ay + y, ax + x * 2, "%02u", map[y][x]);
+    }
+  }
+}
+
+void mvwprintmaprange(WINDOW *window, unsigned ax, unsigned ay, unsigned x,
+                      unsigned y, unsigned width, unsigned height,
+                      const Map &map) {
+  for (unsigned i = 0; i < height; ++i) {
+    for (unsigned j = 0; j < width; ++j) {
+      mvwprintw(window, ay + y + i, ax + (x + j) * 2, "%02u",
+                map[y + i][x + j]);
     }
   }
 }

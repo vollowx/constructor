@@ -1,13 +1,17 @@
-#include "ncurses.h"
+#ifndef MAP_H
+#define MAP_H
+
+#include <ncurses.h>
 #include <vector>
 
 class Map {
 private:
-  std::vector<std::vector<unsigned>> data;
+  // FIXME: data should be private
 
 public:
   const unsigned width;
   const unsigned height;
+  std::vector<std::vector<unsigned>> data;
 
   Map(unsigned width, unsigned height);
 
@@ -15,9 +19,16 @@ public:
   std::vector<unsigned> &operator[](unsigned index);
 
   void reset();
-  void fill(unsigned ax, unsigned ay, unsigned bx, unsigned by, unsigned btype);
+  void fill(unsigned ax, unsigned ay, unsigned width, unsigned height,
+            unsigned btype);
 };
 
 void mvprintmap(unsigned ax, unsigned ay, const Map &map);
 void mvprintmaprange(unsigned ax, unsigned ay, unsigned x, unsigned y,
                      unsigned width, unsigned height, const Map &map);
+void mvwprintmap(WINDOW *window, unsigned ax, unsigned ay, const Map &map);
+void mvwprintmaprange(WINDOW *window, unsigned ax, unsigned ay, unsigned x,
+                      unsigned y, unsigned width, unsigned height,
+                      const Map &map);
+
+#endif
