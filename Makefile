@@ -1,8 +1,8 @@
 CC=clang++
 CFLAGS=-Wall -Wextra -std=c++11
-LIBS=-lncurses
+LIBS=-lncurses -lmenu
 
-SRC=main.cpp map.cpp save.cpp
+SRC=main.cpp tui/menu.cpp map.cpp save.cpp activity_main_menu.cpp activity_settings.cpp activity_game.cpp
 
 all: constructor
 

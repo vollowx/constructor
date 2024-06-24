@@ -6,12 +6,11 @@
 
 class Map {
 private:
-  // FIXME: data should be private
+  std::vector<std::vector<unsigned>> data;
 
 public:
   const unsigned width;
   const unsigned height;
-  std::vector<std::vector<unsigned>> data;
 
   Map(unsigned width, unsigned height);
 

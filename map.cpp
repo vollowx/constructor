@@ -1,8 +1,8 @@
 #include "map.h"
 
 Map::Map(unsigned width, unsigned height)
-    : width(width), height(height),
-      data(height, std::vector<unsigned>(width, 0)) {}
+    : data(height, std::vector<unsigned>(width, 0)), width(width),
+      height(height) {}
 
 const std::vector<unsigned> &Map::operator[](unsigned index) const {
   return data[index];
