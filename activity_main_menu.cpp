@@ -15,10 +15,10 @@ bool activity_main_menu() {
   });
   // main_menu.add_item("Load", "", [&]() -> void { /* activity_load_game(); */
   // });
-  // main_menu.add_item("Settings", "", [&]() -> void {
-  //   while (activity_settings()) {
-  //   };
-  // });
+  main_menu.add_item("Settings", "", [&]() -> void {
+    while (activity_settings()) {
+    };
+  });
   main_menu.add_item("Quit", "", [&]() -> void { quit = true; });
   // main_menu.add_item("Add", "New Item", [&]() -> void {
   //   // name: New Item + i

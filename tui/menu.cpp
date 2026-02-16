@@ -3,12 +3,22 @@
 // TODO: Privide options to re-position the menu, and pre-provide some anchors
 // like `centercenter`, `topleft`, `bottomright`, etc.
 
-nco::menu::menu() { _menu = new_menu(nullptr); }
+nco::menu::menu() { 
+  _menu = new_menu(nullptr); 
+  _window = nullptr;
+  _selected_index = 0;
+}
 
 nco::menu::~menu() {
-  free_menu(_menu);
+  if (_menu) {
+    unpost_menu(_menu);
+    free_menu(_menu);
+  }
   for (ITEM *item : _items) {
     free_item(item);
+  }
+  if (_window) {
+    delwin(_window);
   }
 }
 
@@ -70,16 +80,14 @@ void nco::menu::render() {
       break;
     case 10: // Enter key
       end = true;
-      unpost_menu(_menu);
-      delwin(_window);
-
+      // Save the selected index before unposting
+      ITEM *current = current_item(_menu);
+      _selected_index = item_index(current);
       break;
     }
   }
 }
 
 void nco::menu::exec_callback() {
-  ITEM *index = current_item(_menu);
-  int choice = item_index(index);
-  _callbacks[choice]();
+  _callbacks[_selected_index]();
 }

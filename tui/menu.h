@@ -36,6 +36,7 @@ private:
   std::string _title;
   std::vector<ITEM *> _items;
   std::vector<std::function<void()>> _callbacks;
+  int _selected_index;
 };
 
 } // namespace nco
