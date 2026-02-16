@@ -11,6 +11,7 @@
     clrtoeol();                                                                \
   } while (0)
 
+// Global save state - maintained across menu navigation
 static Save *current_save = nullptr;
 
 void activity_game() {
@@ -30,6 +31,10 @@ void activity_game() {
   box(mapwin, 0, 0);
   mvwprintw(mapwin, 0, 2, "Map");
   mvwprintmap(mapwin, 1, 1, current_save->map);
+
+  // Display help text
+  mvprintw(LINES - 2, 0, "Controls: (q)uit (r)eset (a)dd random | Ctrl+(s)ave Ctrl+(o)pen");
+  mvprintw(LINES - 1, 0, "Ready");
 
   while (true) {
     refresh();
@@ -82,6 +87,7 @@ void activity_game() {
       int rx = rand() % (current_save->map.width - rw + 1);
       int ry = rand() % (current_save->map.height - rh + 1);
 
+      // Random block type: multiples of 11 from 0 to 88 (0, 11, 22, ..., 88)
       int rn = (rand() % 9) * 11;
 
       current_save->map.fill(rx, ry, rw, rh, rn);
@@ -97,6 +103,8 @@ void activity_game() {
   }
 
   delwin(mapwin);
+  clear();
+  refresh();
 }
 
 void activity_new_game() {

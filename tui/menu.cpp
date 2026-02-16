@@ -1,6 +1,6 @@
 #include "menu.h"
 
-// TODO: Privide options to re-position the menu, and pre-provide some anchors
+// TODO: Provide options to re-position the menu, and pre-provide some anchors
 // like `centercenter`, `topleft`, `bottomright`, etc.
 
 nco::menu::menu() { 
