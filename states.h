@@ -1,3 +1,7 @@
+#ifndef STATES_H
+#define STATES_H
+
+STATES_H
 typedef enum {
   STATE_UNREACHABLE, // For always-on models like log
   STATE_MAIN_MENU,
@@ -6,3 +10,8 @@ typedef enum {
   STATE_OPTIONS,
   STATE_QUIT,
 } GameState;
+
+// Defined in main.c
+extern GameState next_state;
+
+#endif

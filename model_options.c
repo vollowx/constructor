@@ -49,8 +49,6 @@
 #define OPTIONS_HEIGHT 32
 #define OPTIONS_WIDTH 48
 
-extern GameState next_state;
-
 static ITEM **opt_items;
 static MENU *opt_menu;
 static WINDOW *opt_win;

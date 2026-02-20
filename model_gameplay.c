@@ -2,11 +2,7 @@
 #include "models.h"
 #include "states.h"
 
-extern int next_state;
-
-void gameplay_init() {
-  // refresh();
-}
+void gameplay_init() {}
 
 void gameplay_input(int ch) {
   if (ch == 'm') {
