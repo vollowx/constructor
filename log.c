@@ -5,13 +5,6 @@
 #include "log.h"
 #include "options.h"
 
-typedef struct {
-
-  LogLevel level;
-
-  char msg[128];
-} LogEntry;
-
 LogEntry logs[LOG_CAPACITY];
 int log_count = 0;
 WINDOW *log_win = NULL;
@@ -43,11 +36,9 @@ void log_render() {
   werase(log_win);
   mvwhline(log_win, 0, 0, ACS_HLINE, COLS);
 
-  int display_row = 1; // Start rendering below the HLINE
+  int display_row = 1;
 
-  // Iterate through our stored logs
   for (int i = 0; i < log_count; i++) {
-    // FILTER: Skip if message level is lower than setting
     if (logs[i].level < current_options.log_level) {
       continue;
     }
@@ -62,7 +53,6 @@ void log_render() {
     mvwprintw(log_win, display_row, 0, "%s %s", prefix, logs[i].msg);
     display_row++;
 
-    // Stop if we run out of window space
     if (display_row > LOG_CAPACITY)
       break;
   }
