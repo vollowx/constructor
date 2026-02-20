@@ -1,11 +1,12 @@
-# constructor
+# Constructor
 
 _Note that we use C++ for only OOP and the emitted `struct` keyword. Beside this, we follow the C naming styles and other things._
 
 ## Development
 
-- Compiler needed: `g++` with C++11 support
-- Libraries needed: `ncurses`
+- `make`
+- `gcc`
+- `ncurses`
 
 To compile the binary, run:
 

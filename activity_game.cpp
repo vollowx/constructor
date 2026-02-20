@@ -1,1 +1,0 @@
-void activity_game() {}

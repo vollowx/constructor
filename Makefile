@@ -1,16 +1,13 @@
-CC=clang++
-CFLAGS=-Wall -Wextra -std=c++11
+CC=gcc
+CFLAGS=-Wall -Wextra
 LIBS=-lncurses -lmenu
 
-SRC=main.cpp tui/menu.cpp map.cpp save.cpp activity_main_menu.cpp activity_settings.cpp activity_game.cpp
+SRC=main.c log.c options.c activity_main_menu.c activity_gameplay.c activity_options.c
 
 all: build
 
 build: $(SRC)
 	$(CC) $(CFLAGS) $(SRC) -o constructor $(LIBS)
-
-build-debug: $(SRC)
-	$(CC) $(CFLAGS) -g $(SRC) -o constructor $(LIBS)
 
 clean:
 	rm -f constructor
