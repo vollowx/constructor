@@ -122,7 +122,7 @@ void rebuild_options_menu() {
 void options_init() {
   opt_win =
       newwin(OPTIONS_HEIGHT + 4, OPTIONS_WIDTH + 4,
-             (LINES + 4 - OPTIONS_HEIGHT) / 2, (COLS + 4 - OPTIONS_WIDTH) / 2);
+             (LINES + 2 - OPTIONS_HEIGHT) / 2, (COLS + 2 - OPTIONS_WIDTH) / 2);
   keypad(opt_win, TRUE);
   rebuild_options_menu();
 }
@@ -185,8 +185,8 @@ void options_cleanup() {
 
 void options_resize() {
   if (opt_win)
-    mvwin(opt_win, (LINES + 4 - OPTIONS_HEIGHT) / 2,
-          (COLS + 4 - OPTIONS_WIDTH) / 2);
+    mvwin(opt_win, (LINES + 2 - OPTIONS_HEIGHT) / 2,
+          (COLS + 2 - OPTIONS_WIDTH) / 2);
 }
 
 DEFINE_ACTIVITY(options);

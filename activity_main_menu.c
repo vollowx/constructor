@@ -25,8 +25,8 @@ void main_menu_init() {
 
   my_menu = new_menu(my_items);
   my_menu_win = newwin(MAIN_MENU_HEIGHT + 4, MAIN_MENU_WIDTH + 4,
-                       (LINES + 4 - MAIN_MENU_HEIGHT) / 2,
-                       (COLS + 4 - MAIN_MENU_WIDTH) / 2);
+                       (LINES + 2 - MAIN_MENU_HEIGHT) / 2,
+                       (COLS + 2 - MAIN_MENU_WIDTH) / 2);
   keypad(my_menu_win, TRUE);
 
   set_menu_win(my_menu, my_menu_win);
@@ -72,8 +72,8 @@ void main_menu_input(int ch) {
 void main_menu_render() { wrefresh(my_menu_win); }
 
 void main_menu_resize() {
-  mvwin(my_menu_win, (LINES + 4 - MAIN_MENU_HEIGHT) / 2,
-        (COLS + 4 - MAIN_MENU_WIDTH) / 2);
+  mvwin(my_menu_win, (LINES + 2 - MAIN_MENU_HEIGHT) / 2,
+        (COLS + 2 - MAIN_MENU_WIDTH) / 2);
 }
 
 void main_menu_cleanup() {
