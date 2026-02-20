@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall -Wextra
 LIBS=-lncurses -lmenu
 
-SRC=main.c log.c options.c activity_main_menu.c activity_gameplay.c activity_options.c
+SRC=main.c log.c options.c model_log.c model_main_menu.c model_gameplay.c model_options.c
 
 all: build
 

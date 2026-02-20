@@ -1,5 +1,5 @@
-#include "activities.h"
 #include "log.h"
+#include "models.h"
 #include "states.h"
 
 extern int next_state;
@@ -22,7 +22,6 @@ void gameplay_render() {
 
 void gameplay_resize() {}
 
-void gameplay_cleanup() {
-}
+void gameplay_cleanup() {}
 
-DEFINE_ACTIVITY(gameplay);
+DEFINE_MODEL(gameplay);

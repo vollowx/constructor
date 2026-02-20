@@ -1,22 +1,22 @@
-#include "activities.h"
 #include "log.h"
+#include "models.h"
 #include "options.h"
 #include "states.h"
 
 GameState next_state = STATE_MAIN_MENU;
 GameState current_state = (GameState)-1;
-Activity *current_activity = NULL;
+Model *current_model = NULL;
 
 void update_activity_ptr(GameState state) {
   switch (state) {
-#define X(enum_part, suffix)                                                   \
-  case STATE_##enum_part:                                                      \
-    current_activity = &activity_##suffix;                                     \
+#define X(_state, suffix)                                                      \
+  case STATE_##_state:                                                         \
+    current_model = &model_##suffix;                                           \
     break;
-    ACTIVITY_MAP(X)
+    MODEL_MAP(X)
 #undef X
   default:
-    current_activity = NULL;
+    current_model = NULL;
     break;
   }
 }
@@ -38,45 +38,45 @@ int main() {
 
   while (next_state != STATE_QUIT) {
     if (next_state != current_state) {
-      if (current_activity) {
+      if (current_model) {
         erase();
-        current_activity->cleanup();
+        current_model->cleanup();
       }
 
       current_state = next_state;
       update_activity_ptr(current_state);
 
-      if (current_activity) {
-        current_activity->init();
-        current_activity->render();
+      if (current_model) {
+        current_model->init();
+        current_model->render();
       }
     }
 
     timeout(16);
 
-    if (current_activity) {
+    if (current_model) {
       ch = getch();
 
       if (ch != ERR) {
         if (ch == KEY_RESIZE) {
           erase();
-          current_activity->resize();
+          current_model->resize();
           log_resize();
           refresh();
         } else {
-          current_activity->input(ch);
+          current_model->input(ch);
         }
       }
 
-      current_activity->render();
+      current_model->render();
     }
 
     log_render();
   }
 
   log_cleanup();
-  if (current_activity)
-    current_activity->cleanup();
+  if (current_model)
+    current_model->cleanup();
   endwin();
 
   return 0;

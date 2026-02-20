@@ -3,7 +3,7 @@
 
 #include <menu.h>
 
-#include "activities.h"
+#include "models.h"
 #include "options.h"
 #include "states.h"
 
@@ -194,4 +194,4 @@ void options_resize() {
           (COLS + 2 - OPTIONS_WIDTH) / 2);
 }
 
-DEFINE_ACTIVITY(options);
+DEFINE_MODEL(options);

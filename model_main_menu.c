@@ -1,8 +1,9 @@
-#include <menu.h>
 #include <stdlib.h>
 
-#include "activities.h"
+#include <menu.h>
+
 #include "log.h"
+#include "models.h"
 #include "states.h"
 
 #define MAIN_MENU_HEIGHT 4
@@ -85,4 +86,4 @@ void main_menu_cleanup() {
   delwin(my_menu_win);
 }
 
-DEFINE_ACTIVITY(main_menu);
+DEFINE_MODEL(main_menu);

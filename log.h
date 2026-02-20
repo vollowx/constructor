@@ -13,10 +13,9 @@ typedef struct {
 #define LOG_CAPACITY 5
 #define log_add(level, fmt, ...) log_message(level, fmt, ##__VA_ARGS__)
 
-void log_init();
 void log_message(LogLevel level, const char *fmt, ...);
-void log_render();
-void log_resize();
-void log_cleanup();
+
+extern LogEntry logs[LOG_CAPACITY];
+extern int log_count;
 
 #endif

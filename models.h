@@ -1,5 +1,5 @@
-#ifndef ACTIVITIES_H
-#define ACTIVITIES_H
+#ifndef MODELS_H
+#define MODELS_H
 
 #include <ncurses.h>
 
@@ -9,17 +9,18 @@ typedef struct {
   void (*render)();
   void (*resize)();
   void (*cleanup)();
-} Activity;
+} Model;
 
 // X(state, name)
-#define ACTIVITY_MAP(X)                                                        \
+#define MODEL_MAP(X)                                                           \
+  X(UNREACHABLE, log)                                                          \
   X(MAIN_MENU, main_menu)                                                      \
   X(GAMEPLAY, gameplay)                                                        \
   X(OPTIONS, options)
 
-#define DEFINE_ACTIVITY(name)                                                  \
-  Activity activity_##name = {name##_init, name##_input, name##_render,        \
-                              name##_resize, name##_cleanup}
+#define DEFINE_MODEL(name)                                                     \
+  Model model_##name = {name##_init, name##_input, name##_render,              \
+                        name##_resize, name##_cleanup}
 
 #define X(state, name)                                                         \
   void name##_init();                                                          \
@@ -27,8 +28,8 @@ typedef struct {
   void name##_render();                                                        \
   void name##_resize();                                                        \
   void name##_cleanup();                                                       \
-  extern Activity activity_##name;
-ACTIVITY_MAP(X)
+  extern Model model_##name;
+MODEL_MAP(X)
 #undef X
 
 #endif
