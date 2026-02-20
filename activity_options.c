@@ -94,16 +94,21 @@ void rebuild_options_menu() {
 
   opt_items[i++] = new_caption("  Other");
 
-  static char lvl_line[64], show_line[64];
+  static char log_level_line[64], log_show_line[64], log_save_line[64];
   const char *lvls[] = {"<Information>", "<Warning>", "<Error>"};
 
-  format_menu_item(lvl_line, sizeof(lvl_line), "Show log level",
+  format_menu_item(log_level_line, sizeof(log_level_line), "Show log level",
                    lvls[current_options.log_level]);
-  format_menu_item(show_line, sizeof(show_line), "Show log window",
+  format_menu_item(log_show_line, sizeof(log_show_line), "Show log window",
                    current_options.show_log ? "[x]" : "[ ]");
+  format_menu_item(log_save_line, sizeof(log_save_line), "Save log locally",
+                   current_options.save_log ? "[x]" : "[ ]");
 
-  opt_items[i++] = new_item(lvl_line, "");
-  opt_items[i++] = new_item(show_line, "");
+  opt_items[i++] = new_item(log_level_line, "");
+  opt_items[i++] = new_item(log_show_line, "");
+  opt_items[i++] = new_item(log_save_line, "");
+  opt_items[i++] = new_item("Clear logs", "");
+  opt_items[i++] = new_item("Clear local logs", "");
 
   opt_items[i++] = new_caption(" ");
   opt_items[i++] = new_item("Save", "");

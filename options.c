@@ -18,6 +18,8 @@ void options_load() {
   while (fscanf(f, "%31[^=]=%d\n", key, &val) == 2) {
     if (strcmp(key, "log_level") == 0)
       current_options.log_level = val;
+    else if (strcmp(key, "save_log") == 0)
+      current_options.save_log = (bool)val;
     else if (strcmp(key, "show_log") == 0)
       current_options.show_log = (bool)val;
   }
@@ -32,6 +34,7 @@ void options_save() {
   if (!f)
     return;
   fprintf(f, "log_level=%d\n", current_options.log_level);
+  fprintf(f, "save_log=%d\n", (int)current_options.save_log);
   fprintf(f, "show_log=%d\n", (int)current_options.show_log);
   fclose(f);
 

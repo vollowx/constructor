@@ -5,6 +5,7 @@
 
 typedef struct {
   int log_level;
+  bool save_log;
   bool show_log;
 } GameOptions;
 
