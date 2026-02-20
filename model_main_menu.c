@@ -2,14 +2,11 @@
 
 #include <menu.h>
 
-#include "log.h"
 #include "models.h"
 #include "states.h"
 
 #define MAIN_MENU_HEIGHT 4
 #define MAIN_MENU_WIDTH 32
-
-extern int next_state;
 
 ITEM **my_items;
 MENU *my_menu;
