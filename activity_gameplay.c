@@ -23,8 +23,6 @@ void gameplay_render() {
 void gameplay_resize() {}
 
 void gameplay_cleanup() {
-  clear();
-  refresh();
 }
 
 DEFINE_ACTIVITY(gameplay);

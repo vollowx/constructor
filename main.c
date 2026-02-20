@@ -38,8 +38,10 @@ int main() {
 
   while (next_state != STATE_QUIT) {
     if (next_state != current_state) {
-      if (current_activity)
+      if (current_activity) {
+        erase();
         current_activity->cleanup();
+      }
 
       current_state = next_state;
       update_activity_ptr(current_state);
@@ -64,8 +66,9 @@ int main() {
         } else {
           current_activity->input(ch);
         }
-        current_activity->render();
       }
+
+      current_activity->render();
     }
 
     log_render();

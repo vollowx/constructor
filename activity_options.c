@@ -181,8 +181,6 @@ void options_cleanup() {
     delwin(opt_win);
     opt_win = NULL;
   }
-  erase();
-  refresh();
 }
 
 void options_resize() {

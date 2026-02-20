@@ -83,9 +83,6 @@ void main_menu_cleanup() {
     free_item(my_items[i]);
   free(my_items);
   delwin(my_menu_win);
-
-  clear();
-  refresh();
 }
 
 DEFINE_ACTIVITY(main_menu);
