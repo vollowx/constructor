@@ -58,7 +58,7 @@ typedef struct {
   char name[32];
   int health;
   int health_max;
-  int x, y;
+  size_t x, y;
   Elevation z;
 
   ItemStacks inventory;
@@ -72,7 +72,8 @@ typedef struct {
 
 typedef struct {
   int id;
-  int w, h, x, y;
+  int w, h;
+  size_t x, y;
   int health;
   bool is_passable;
 } MapObject;

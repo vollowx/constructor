@@ -94,7 +94,7 @@ void saves_input(int ch) {
       game_init(&game);
       Save save = {0};
       save_init(&save, &game, "Char");
-      save_write(&save, idx);
+      save_save(&save, idx);
       free_game(&game);
 
       rebuild_saves_menu();

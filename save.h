@@ -32,8 +32,8 @@ typedef struct {
   bool exists;
 } SavePreview;
 
-SaveResult save_write(const Save *save, int slot);
 SaveResult save_load(Save *save, int slot);
+SaveResult save_save(const Save *save, int slot);
 void save_init(Save *save, Game *game, const char *player_name);
 
 SavePreview get_slot_preview(int slot);

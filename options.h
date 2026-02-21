@@ -12,6 +12,6 @@ typedef struct {
 extern GameOptions current_options;
 
 void options_load();
-void options_write();
+void options_save();
 
 #endif

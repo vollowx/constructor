@@ -165,7 +165,7 @@ void options_input(int ch) {
       rebuild_options_menu();
       refresh();
     } else if (strcmp(name, "Save") == 0) {
-      options_write();
+      options_save();
       next_state = STATE_MAIN_MENU;
     } else if (strcmp(name, "Cancel") == 0) {
       options_load();

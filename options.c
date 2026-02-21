@@ -30,7 +30,7 @@ void options_load() {
   info("[options] loaded from %s", PATH_OPTIONS);
 }
 
-void options_write() {
+void options_save() {
   FILE *f = fopen(PATH_OPTIONS, "w");
 
   if (!f)
