@@ -2,6 +2,7 @@
 
 #include <menu.h>
 
+#include "helpers.h"
 #include "log.h"
 #include "models.h"
 #include "save.h"
@@ -156,28 +157,8 @@ void saves_resize() {
 }
 
 void saves_cleanup() {
-  if (s_menu) {
-    unpost_menu(s_menu);
+  free_menu_ctx(s_win, s_menu, s_items, 3, true);
 
-    WINDOW *sub = menu_sub(s_menu);
-    if (sub)
-      delwin(sub);
-
-    free_menu(s_menu);
-    s_menu = NULL;
-  }
-  if (s_items) {
-    for (int i = 0; i < 3; i++) {
-      free((void *)item_name(s_items[i]));
-      free_item(s_items[i]);
-    }
-    free(s_items);
-    s_items = NULL;
-  }
-  if (s_win) {
-    delwin(s_win);
-    s_win = NULL;
-  }
   if (s_pre) {
     delwin(s_pre);
     s_pre = NULL;

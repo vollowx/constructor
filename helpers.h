@@ -29,6 +29,31 @@
 
 #define UNUSED (void)
 
+#define free_menu_ctx(win, menu, items, n_items, owns_labels)                  \
+  do {                                                                         \
+    if (menu) {                                                                \
+      unpost_menu(menu);                                                       \
+      WINDOW *sub = menu_sub(menu);                                            \
+      if (sub)                                                                 \
+        delwin(sub);                                                           \
+      free_menu(menu);                                                         \
+      menu = NULL;                                                             \
+    }                                                                          \
+    if (items) {                                                               \
+      for (int i = 0; i < n_items; i++) {                                      \
+        if (owns_labels)                                                       \
+          free((void *)item_name(items[i]));                                   \
+        free_item(items[i]);                                                   \
+      }                                                                        \
+      free(items);                                                             \
+      items = NULL;                                                            \
+    }                                                                          \
+    if (win) {                                                                 \
+      delwin(win);                                                             \
+      win = NULL;                                                              \
+    }                                                                          \
+  } while (0)
+
 #define NOB_REALLOC realloc
 #define NOB_FREE free
 #define NOB_ASSERT assert

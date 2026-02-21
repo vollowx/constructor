@@ -3,6 +3,7 @@
 
 #include <menu.h>
 
+#include "helpers.h"
 #include "log.h"
 #include "models.h"
 #include "options.h"
@@ -47,7 +48,7 @@
 //  └──────────────────────────────────────────────────┘
 
 #define OPTIONS_HEIGHT 32
-#define OPTIONS_WIDTH 48
+#define OPTIONS_WIDTH 56
 
 static ITEM **o_items = NULL;
 static MENU *o_menu = NULL;
@@ -62,7 +63,7 @@ ITEM *new_caption(const char *title) {
 void format_menu_item(char *dest, size_t size, const char *label,
                       const char *value) {
   int label_width = 16;
-  int total_width = OPTIONS_WIDTH - 4;
+  int total_width = OPTIONS_WIDTH - 8;
   snprintf(dest, size, "%-*s %*s", label_width, label,
            (total_width - label_width), value);
 }
@@ -80,14 +81,14 @@ void rebuild_options_menu() {
     o_menu = NULL;
   }
   if (o_items) {
-    for (int i = 0; i < OPTIONS_HEIGHT + 1; i++) {
+    for (int i = 0; i < OPTIONS_HEIGHT - 4 + 1; i++) {
       free_item(o_items[i]);
     }
     free(o_items);
     o_items = NULL;
   }
 
-  o_items = (ITEM **)calloc(OPTIONS_HEIGHT + 1, sizeof(ITEM *));
+  o_items = (ITEM **)calloc(OPTIONS_HEIGHT - 4 + 1, sizeof(ITEM *));
   int i = 0;
 
   o_items[i++] = new_caption("  Game");
@@ -123,7 +124,7 @@ void rebuild_options_menu() {
 
   o_menu = new_menu(o_items);
   set_menu_win(o_menu, o_win);
-  set_menu_sub(o_menu, derwin(o_win, OPTIONS_HEIGHT, OPTIONS_WIDTH, 2, 1));
+  set_menu_sub(o_menu, derwin(o_win, OPTIONS_HEIGHT - 4, OPTIONS_WIDTH - 4, 2, 1));
   set_menu_mark(o_menu, " > ");
   set_current_item(o_menu, o_items[current_idx]);
 
@@ -133,9 +134,8 @@ void rebuild_options_menu() {
 void options_init() {
   info("primary model switched to options");
 
-  o_win =
-      newwin(OPTIONS_HEIGHT + 4, OPTIONS_WIDTH + 4,
-             (LINES + 2 - OPTIONS_HEIGHT) / 2, (COLS + 2 - OPTIONS_WIDTH) / 2);
+  o_win = newwin(OPTIONS_HEIGHT, OPTIONS_WIDTH, (LINES - OPTIONS_HEIGHT) / 2,
+                 (COLS - OPTIONS_WIDTH) / 2);
   keypad(o_win, TRUE);
   rebuild_options_menu();
 }
@@ -184,30 +184,9 @@ void options_render() {
 
 void options_resize() {
   if (o_win)
-    mvwin(o_win, (LINES + 2 - OPTIONS_HEIGHT) / 2,
-          (COLS + 2 - OPTIONS_WIDTH) / 2);
+    mvwin(o_win, (LINES - OPTIONS_HEIGHT) / 2, (COLS - OPTIONS_WIDTH) / 2);
 }
 
 void options_cleanup() {
-  if (o_menu) {
-    unpost_menu(o_menu);
-
-    WINDOW *sub = menu_sub(o_menu);
-    if (sub)
-      delwin(sub);
-
-    free_menu(o_menu);
-    o_menu = NULL;
-  }
-  if (o_items) {
-    for (int i = 0; i < OPTIONS_HEIGHT + 1; i++) {
-      free_item(o_items[i]);
-    }
-    free(o_items);
-    o_items = NULL;
-  }
-  if (o_win) {
-    delwin(o_win);
-    o_win = NULL;
-  }
+  free_menu_ctx(o_win, o_menu, o_items, OPTIONS_HEIGHT - 4, false);
 }

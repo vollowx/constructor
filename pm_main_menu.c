@@ -2,11 +2,13 @@
 
 #include <menu.h>
 
+#include "helpers.h"
 #include "log.h"
 #include "models.h"
 
 #define MAIN_MENU_HEIGHT 4
 #define MAIN_MENU_WIDTH 32
+#define MAIN_MENU_N_ITEMS 4
 
 ITEM **m_items;
 MENU *m_menu;
@@ -17,10 +19,9 @@ void main_menu_init() {
 
   char *labels[] = {"Start Game", "Options", "About",
                     "Quit                         ", (char *)NULL};
-  int n_choices = 4;
 
-  m_items = (ITEM **)calloc(n_choices + 1, sizeof(ITEM *));
-  for (int i = 0; i < n_choices; ++i)
+  m_items = (ITEM **)calloc(MAIN_MENU_N_ITEMS + 1, sizeof(ITEM *));
+  for (int i = 0; i < MAIN_MENU_N_ITEMS; ++i)
     m_items[i] = new_item(labels[i], "");
 
   m_menu = new_menu(m_items);
@@ -81,13 +82,5 @@ void main_menu_resize() {
 }
 
 void main_menu_cleanup() {
-  unpost_menu(m_menu);
-  WINDOW *sub = menu_sub(m_menu);
-  if (sub)
-    delwin(sub);
-  free_menu(m_menu);
-  for (int i = 0; i < 3; ++i)
-    free_item(m_items[i]);
-  free(m_items);
-  delwin(m_win);
+  free_menu_ctx(m_win, m_menu, m_items, MAIN_MENU_N_ITEMS, false);
 }
