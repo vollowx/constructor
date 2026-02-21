@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "game.h"
 #include "helpers.h"
 #include "log.h"
 #include "save.h"
@@ -15,19 +16,20 @@ static void get_path(int slot, char *buf, size_t len) {
   snprintf(buf, len, "save%d.dat", slot);
 }
 
-static SaveResult map_load(Map *map, FILE *fp) {
+static SaveResult map_load(Map **map_ptr, FILE *fp) {
   size_t w, h;
   if (fread(&w, sizeof(size_t), 1, fp) != 1)
     return SAVE_ERR_READ;
   if (fread(&h, sizeof(size_t), 1, fp) != 1)
     return SAVE_ERR_READ;
 
-  // Use the proper engine functions to clear and rebuild the map
-  if (map) {
-    free_map(map);
+  if (*map_ptr) {
+    free_map(*map_ptr);
   }
-  map = new_map(h, w);
-  if (!map)
+  *map_ptr = new_map(h, w);
+  Map *map = *map_ptr;
+
+  if (!map_ptr)
     return SAVE_ERR_READ;
 
   for (size_t y = 0; y < h; ++y) {
@@ -75,13 +77,12 @@ SaveResult save_load(Save *self, int slot) {
 
   info("[save] Header valid with player: %s", self->header.player_name);
 
-  if (map_load(self->game->map, fp) != SAVE_OK) {
+  if (map_load(&self->game->map, fp) != SAVE_OK) {
     error("[save] Failed loading map");
     fclose(fp);
     return SAVE_ERR_READ;
   }
 
-  // Read Entities
   uint64_t entity_count;
 
   if (fread(&entity_count, sizeof(uint64_t), 1, fp) != 1) {

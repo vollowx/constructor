@@ -71,7 +71,7 @@ void saves_init() {
 }
 
 void saves_input(int ch) {
-  int idx = item_index(current_item(s_menu));
+  int slot = item_index(current_item(s_menu));
 
   switch (ch) {
   case KEY_DOWN:
@@ -86,7 +86,7 @@ void saves_input(int ch) {
     break;
 
   case 10:
-    if (previews[idx].exists) {
+    if (previews[slot].exists) {
       // current_slot = idx
       next_state = STATE_GAMEPLAY;
     } else {
@@ -94,7 +94,7 @@ void saves_input(int ch) {
       game_init(&game);
       Save save = {0};
       save_init(&save, &game, "Char");
-      save_save(&save, idx);
+      save_save(&save, slot);
       free_game(&game);
 
       rebuild_saves_menu();
@@ -107,16 +107,37 @@ void saves_input(int ch) {
     // next_state = STATE_SAVE_DELETE
     break;
   case 'r':
-    info("rename requested for slot %d", idx);
-    if (previews[idx].exists) {
-      // current_slot = idx
-      // next_state = STATE_SAVE_RENAME
-    } else {
-      info("Slot %d does not exist", idx);
+    echo();
+    curs_set(1);
+
+    char new_name[32];
+
+    mvwprintw(s_pre, 2, 22, "%32s", "");
+    wmove(s_pre, 2, 22);
+    wgetnstr(s_pre, new_name, 31);
+
+    noecho();
+    curs_set(0);
+
+    if (strlen(new_name) > 0) {
+      Game game = {0};
+      Save save = {0};
+      save.game = &game;
+      if (save_load(&save, slot) == SAVE_OK) {
+        strcpy(save.header.player_name, new_name);
+        strcpy(game.player->name, new_name);
+        if (save_save(&save, slot) == SAVE_OK) {
+          info("[save] Renamed slot %d to %s", slot, new_name);
+        } else {
+          error("[save] Failed to rename slot saving save");
+        }
+      } else {
+        error("[save] Failed to rename slot loading save");
+      }
+      free_game(save.game);
     }
-    break;
-  case 27: // ESC
-    next_state = STATE_MAIN_MENU;
+
+    rebuild_saves_menu();
     break;
   }
 }
@@ -126,25 +147,30 @@ void saves_render() {
     return;
 
   box(s_win, 0, 0);
-  mvwprintw(s_win, 0, 2, " Select Save ");
+  mvwprintw(s_win, 0, 3, " Select Save ");
   wrefresh(s_win);
 
   werase(s_pre);
   box(s_pre, 0, 0);
-  mvwprintw(s_pre, 0, 2, " Preview ");
+  mvwprintw(s_pre, 0, 3, " Preview ");
 
   int idx = item_index(current_item(s_menu));
   if (previews[idx].exists) {
-    wattron(s_pre, COLOR_PAIR(1)); // Using INFO color for name
-    mvwprintw(s_pre, 2, 2, "PLAYER: %s", previews[idx].header.player_name);
+    wattron(s_pre, COLOR_PAIR(1));
+    mvwprintw(s_pre, 2, 2, "%16s", "player");
     wattroff(s_pre, COLOR_PAIR(1));
+    mvwprintw(s_pre, 2, 22, "%s", previews[idx].header.player_name);
 
-    mvwprintw(s_pre, 4, 2, "Version:  %d", previews[idx].header.version);
-    mvwprintw(s_pre, 5, 2, "Location: %s", "The Wilderness"); // Example
+    wattron(s_pre, A_DIM);
+    mvwhline(s_pre, 3, 22, ACS_HLINE, 31);
+    wattroff(s_pre, A_DIM);
+
+    mvwprintw(s_pre, 4, 2, "%16s", "version");
+    mvwprintw(s_pre, 4, 22, "%d", previews[idx].header.version);
   } else {
     wattron(s_pre, A_DIM);
-    mvwprintw(s_pre, 2, 2, "Empty Slot");
-    mvwprintw(s_pre, 3, 2, "No data available.");
+    mvwprintw(s_pre, 2, 4, "Empty Slot");
+    mvwprintw(s_pre, 3, 4, "No data available.");
     wattroff(s_pre, A_DIM);
   }
   wrefresh(s_pre);
