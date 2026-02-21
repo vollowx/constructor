@@ -6,7 +6,7 @@ typedef enum {
   STATE_UNREACHABLE, // For always-on models like log
   STATE_QUIT,
 
-  // States that change the current model
+  // States that change the current primary model
   STATE_MAIN_MENU,
   STATE_SAVES,
   STATE_GAMEPLAY,

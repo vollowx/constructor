@@ -48,6 +48,8 @@ void rebuild_saves_menu() {
 }
 
 void saves_init() {
+  info("primary model switched to saves");
+
   int start_y = (LINES - SAVES_HEIGHT) / 2;
   int start_x = (COLS - (SAVES_WIDTH + PREVIEW_WIDTH)) / 2;
 

@@ -3,6 +3,7 @@
 
 #include <menu.h>
 
+#include "log.h"
 #include "models.h"
 #include "options.h"
 #include "states.h"
@@ -123,6 +124,8 @@ void rebuild_options_menu() {
 }
 
 void options_init() {
+  info("primary model switched to options");
+
   opt_win =
       newwin(OPTIONS_HEIGHT + 4, OPTIONS_WIDTH + 4,
              (LINES + 2 - OPTIONS_HEIGHT) / 2, (COLS + 2 - OPTIONS_WIDTH) / 2);

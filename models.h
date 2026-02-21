@@ -15,13 +15,13 @@ typedef struct {
 #define MODEL_MAP(X)                                                           \
   X(UNREACHABLE, log)                                                          \
   X(MAIN_MENU, main_menu)                                                      \
-  X(SAVES, saves)                                                        \
+  X(SAVES, saves)                                                              \
   X(GAMEPLAY, gameplay)                                                        \
   X(OPTIONS, options)
 
-#define DEFINE_MODEL(name)                                                     \
-  Model model_##name = {name##_init, name##_input, name##_render,              \
-                        name##_resize, name##_cleanup}
+// Implementation filename e.g.
+// am_log.c   - Always-on model
+// pm_saves.c - Primary model
 
 #define X(state, name)                                                         \
   void name##_init();                                                          \
@@ -32,5 +32,9 @@ typedef struct {
   extern Model model_##name;
 MODEL_MAP(X)
 #undef X
+
+#define DEFINE_MODEL(name)                                                     \
+  Model model_##name = {name##_init, name##_input, name##_render,              \
+                        name##_resize, name##_cleanup}
 
 #endif

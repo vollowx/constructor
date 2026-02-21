@@ -14,6 +14,8 @@ MENU *m_menu;
 WINDOW *m_win;
 
 void main_menu_init() {
+  info("primary model switched to main_menu");
+
   char *labels[] = {"Start Game", "Options", "About",
                     "Quit                         ", (char *)NULL};
   int n_choices = 4;

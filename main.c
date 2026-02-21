@@ -6,18 +6,19 @@
 
 GameState next_state = STATE_MAIN_MENU;
 GameState current_state = (GameState)-1;
-Model *current_model = NULL;
+// Current primary model
+Model *pm = NULL;
 
 void update_activity_ptr(GameState state) {
   switch (state) {
 #define X(_state, suffix)                                                      \
   case STATE_##_state:                                                         \
-    current_model = &model_##suffix;                                           \
+    pm = &model_##suffix;                                           \
     break;
     MODEL_MAP(X)
 #undef X
   default:
-    current_model = NULL;
+    pm = NULL;
     break;
   }
 }
@@ -44,45 +45,45 @@ int main() {
 
   while (next_state != STATE_QUIT) {
     if (next_state != current_state) {
-      if (current_model) {
+      if (pm) {
         erase();
-        current_model->cleanup();
+        pm->cleanup();
       }
 
       current_state = next_state;
       update_activity_ptr(current_state);
 
-      if (current_model) {
-        current_model->init();
-        current_model->render();
+      if (pm) {
+        pm->init();
+        pm->render();
       }
     }
 
     timeout(16);
 
-    if (current_model) {
+    if (pm) {
       ch = getch();
 
       if (ch != ERR) {
         if (ch == KEY_RESIZE) {
           erase();
-          current_model->resize();
+          pm->resize();
           log_resize();
           refresh();
         } else {
-          current_model->input(ch);
+          pm->input(ch);
         }
       }
 
-      current_model->render();
+      pm->render();
     }
 
     log_render();
   }
 
   log_cleanup();
-  if (current_model)
-    current_model->cleanup();
+  if (pm)
+    pm->cleanup();
   endwin();
 
   free_logs();

@@ -2,7 +2,7 @@
 #include "models.h"
 #include "states.h"
 
-void gameplay_init() {}
+void gameplay_init() { info("primary model switched to gameplay"); }
 
 void gameplay_input(int ch) {
   if (ch == 'm') {
