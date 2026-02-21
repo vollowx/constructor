@@ -12,7 +12,7 @@ void options_load() {
   FILE *f = fopen(PATH_OPTIONS, "r");
 
   if (!f) {
-    info("options.txt not found, using default options");
+    info("[options] %s not found, fallback to default options", PATH_OPTIONS);
     return;
   }
   char key[32];
@@ -27,7 +27,7 @@ void options_load() {
   }
   fclose(f);
 
-  info("options loaded");
+  info("[options] loaded from %s", PATH_OPTIONS);
 }
 
 void options_write() {
@@ -40,5 +40,5 @@ void options_write() {
   fprintf(f, "show_log=%d\n", (int)current_options.show_log);
   fclose(f);
 
-  info("options saved");
+  info("[options] wrote to %s", PATH_OPTIONS);
 }

@@ -55,7 +55,7 @@ void rebuild_saves_menu() {
 }
 
 void saves_init() {
-  info("primary model switched to saves");
+  info("[model] model_saves initializing");
 
   //                          gap
   int total_w = SAVES_WIDTH + 1 + PREVIEW_WIDTH;
@@ -87,21 +87,29 @@ void saves_input(int ch) {
 
   case 10:
     if (previews[idx].exists) {
+      // current_slot = idx
       next_state = STATE_GAMEPLAY;
     } else {
-      next_state = STATE_GAMEPLAY;
+      Game game = {0};
+      game_init(&game);
+      Save save = {0};
+      save_init(&save, &game, "Char");
+      save_write(&save, idx);
+      free_game(&game);
+
+      rebuild_saves_menu();
     }
 
     break;
 
   case 'x':
-    // current_slot = ...
+    // current_slot = idx
     // next_state = STATE_SAVE_DELETE
     break;
   case 'r':
     info("rename requested for slot %d", idx);
     if (previews[idx].exists) {
-      // current_slot = ...
+      // current_slot = idx
       // next_state = STATE_SAVE_RENAME
     } else {
       info("Slot %d does not exist", idx);

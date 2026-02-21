@@ -132,7 +132,7 @@ void rebuild_options_menu() {
 }
 
 void options_init() {
-  info("primary model switched to options");
+  info("[model] model_options initializing");
 
   o_win = newwin(OPTIONS_HEIGHT, OPTIONS_WIDTH, (LINES - OPTIONS_HEIGHT) / 2,
                  (COLS - OPTIONS_WIDTH) / 2);

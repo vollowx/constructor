@@ -4,7 +4,7 @@
 #include <ncurses.h>
 
 #define LOG_MAX_LENGTH 128
-#define LOG_UI_CAPACITY 5
+#define LOG_UI_CAPACITY 8
 
 #define info(fmt, ...) log_message(LOG_INFO, fmt, ##__VA_ARGS__)
 #define warn(fmt, ...) log_message(LOG_WARNING, fmt, ##__VA_ARGS__)

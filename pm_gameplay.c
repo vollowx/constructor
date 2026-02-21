@@ -1,7 +1,7 @@
 #include "log.h"
 #include "models.h"
 
-void gameplay_init() { info("primary model switched to gameplay"); }
+void gameplay_init() { info("[model] model_gameplay initializing"); }
 
 void gameplay_input(int ch) {
   if (ch == 'm') {

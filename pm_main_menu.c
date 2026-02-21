@@ -6,8 +6,8 @@
 #include "log.h"
 #include "models.h"
 
-#define MAIN_MENU_HEIGHT 4
-#define MAIN_MENU_WIDTH 32
+#define MAIN_MENU_HEIGHT 8
+#define MAIN_MENU_WIDTH 36
 #define MAIN_MENU_N_ITEMS 4
 
 ITEM **m_items;
@@ -15,7 +15,7 @@ MENU *m_menu;
 WINDOW *m_win;
 
 void main_menu_init() {
-  info("primary model switched to main_menu");
+  info("[model] model_main_menu initializing");
 
   char *labels[] = {"Start Game", "Options", "About",
                     "Quit                         ", (char *)NULL};
@@ -25,13 +25,13 @@ void main_menu_init() {
     m_items[i] = new_item(labels[i], "");
 
   m_menu = new_menu(m_items);
-  m_win = newwin(MAIN_MENU_HEIGHT + 4, MAIN_MENU_WIDTH + 4,
-                 (LINES + 2 - MAIN_MENU_HEIGHT) / 2,
-                 (COLS + 2 - MAIN_MENU_WIDTH) / 2);
+  m_win = newwin(MAIN_MENU_HEIGHT, MAIN_MENU_WIDTH,
+                 (LINES - MAIN_MENU_HEIGHT) / 2, (COLS - MAIN_MENU_WIDTH) / 2);
   keypad(m_win, TRUE);
 
   set_menu_win(m_menu, m_win);
-  set_menu_sub(m_menu, derwin(m_win, MAIN_MENU_HEIGHT, MAIN_MENU_WIDTH, 2, 1));
+  set_menu_sub(m_menu,
+               derwin(m_win, MAIN_MENU_HEIGHT - 4, MAIN_MENU_WIDTH - 4, 2, 1));
   set_menu_mark(m_menu, " > ");
   box(m_win, 0, 0);
   mvwprintw(m_win, 0, 3, " Constructor ");
@@ -77,8 +77,7 @@ void main_menu_input(int ch) {
 void main_menu_render() { wrefresh(m_win); }
 
 void main_menu_resize() {
-  mvwin(m_win, (LINES + 2 - MAIN_MENU_HEIGHT) / 2,
-        (COLS + 2 - MAIN_MENU_WIDTH) / 2);
+  mvwin(m_win, (LINES - MAIN_MENU_HEIGHT) / 2, (COLS - MAIN_MENU_WIDTH) / 2);
 }
 
 void main_menu_cleanup() {

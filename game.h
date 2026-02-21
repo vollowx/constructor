@@ -106,6 +106,7 @@ void entity_move(Entity *e, int x, int y, Map *map);
 Map *new_map(size_t height, size_t width);
 void free_map(Map *map);
 
+void free_game(Game *game);
 void game_init(Game *game);
 void game_tick(Game *game);
 

@@ -3,8 +3,9 @@
 
 static const ItemDef ITEM_DATABASE[] = {
     {.id = 0, .name = "Iron Ore", .type = ITEM_RESOURCE, .max_stack = 64},
-    {.id = 1, .name = "Apple", .type = ITEM_CONSUMABLE, .max_stack = 20},
-    {.id = 2, .name = "Pickaxe", .type = ITEM_EQUIPMENT, .max_stack = 1}};
+    {.id = 1, .name = "Gold Ore", .type = ITEM_RESOURCE, .max_stack = 64},
+    {.id = 2, .name = "Apple", .type = ITEM_CONSUMABLE, .max_stack = 20},
+    {.id = 3, .name = "Pickaxe", .type = ITEM_EQUIPMENT, .max_stack = 1}};
 
 const ItemDef *item_get_def(int id) {
   for (size_t i = 0; i < sizeof(ITEM_DATABASE) / sizeof(ItemDef); ++i) {
@@ -63,15 +64,10 @@ void free_map(Map *map) {
   if (!map)
     return;
 
-  // 1. Free each row of cells
   for (size_t y = 0; y < map->h; ++y) {
     free(map->cells[y]);
   }
-
-  // 2. Free the row pointer array
   free(map->cells);
-
-  // 3. Free the Map container itself
   free(map);
 }
 
@@ -110,4 +106,33 @@ void game_init(Game *game) {
 
   // 5. Link Player to the Map grid
   game->map->cells[player->y][player->x].entity = player;
+}
+
+void free_game(Game *game) {
+  if (!game)
+    return;
+
+  if (game->map) {
+    free_map(game->map);
+    game->map = NULL;
+  }
+
+  da_foreach(Entity *, it, &game->entities) {
+    Entity *ent = *it;
+    if (ent) {
+      if (ent->inventory.items) {
+        free(ent->inventory.items);
+      }
+      free(ent);
+    }
+  }
+
+  if (game->entities.items) {
+    free(game->entities.items);
+    game->entities.items = NULL;
+  }
+
+  game->entities.count = 0;
+  game->entities.capacity = 0;
+  game->player = NULL;
 }
