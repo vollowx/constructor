@@ -1,11 +1,10 @@
+#include <string.h>
+
 #include <menu.h>
 
 #include "log.h"
 #include "models.h"
-#include <string.h>
-
-#include "save.h" // For SaveHeader
-#include "states.h"
+#include "save.h"
 
 #define SAVES_HEIGHT 10
 #define SAVES_WIDTH 30
@@ -141,5 +140,3 @@ void saves_cleanup() {
 void saves_resize() {
   // Similar to options_resize, re-calculate start_y and start_x
 }
-
-DEFINE_MODEL(saves);

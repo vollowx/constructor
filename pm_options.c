@@ -6,7 +6,6 @@
 #include "log.h"
 #include "models.h"
 #include "options.h"
-#include "states.h"
 
 // Looks like:
 //
@@ -194,5 +193,3 @@ void options_resize() {
     mvwin(opt_win, (LINES + 2 - OPTIONS_HEIGHT) / 2,
           (COLS + 2 - OPTIONS_WIDTH) / 2);
 }
-
-DEFINE_MODEL(options);

@@ -1,6 +1,5 @@
 #include "log.h"
 #include "models.h"
-#include "states.h"
 
 void gameplay_init() { info("primary model switched to gameplay"); }
 
@@ -19,5 +18,3 @@ void gameplay_render() {
 void gameplay_resize() {}
 
 void gameplay_cleanup() {}
-
-DEFINE_MODEL(gameplay);

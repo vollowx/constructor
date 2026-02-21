@@ -4,7 +4,6 @@
 
 #include "log.h"
 #include "models.h"
-#include "states.h"
 
 #define MAIN_MENU_HEIGHT 4
 #define MAIN_MENU_WIDTH 32
@@ -89,5 +88,3 @@ void main_menu_cleanup() {
   free(m_items);
   delwin(m_win);
 }
-
-DEFINE_MODEL(main_menu);

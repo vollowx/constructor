@@ -2,7 +2,6 @@
 #include "models.h"
 #include "options.h"
 #include "save.h"
-#include "states.h"
 
 GameState next_state = STATE_MAIN_MENU;
 GameState current_state = (GameState)-1;
@@ -13,9 +12,9 @@ void update_activity_ptr(GameState state) {
   switch (state) {
 #define X(_state, suffix)                                                      \
   case STATE_##_state:                                                         \
-    pm = &model_##suffix;                                           \
+    pm = &model_##suffix;                                                      \
     break;
-    MODEL_MAP(X)
+    PM_MAP(X)
 #undef X
   default:
     pm = NULL;

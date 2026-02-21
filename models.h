@@ -11,9 +11,10 @@ typedef struct {
   void (*cleanup)();
 } Model;
 
+#define AM_MAP(X) X(log)
+
 // X(state, name)
-#define MODEL_MAP(X)                                                           \
-  X(UNREACHABLE, log)                                                          \
+#define PM_MAP(X)                                                              \
   X(MAIN_MENU, main_menu)                                                      \
   X(SAVES, saves)                                                              \
   X(GAMEPLAY, gameplay)                                                        \
@@ -23,6 +24,16 @@ typedef struct {
 // am_log.c   - Always-on model
 // pm_saves.c - Primary model
 
+#define X(name)                                                                \
+  void name##_init();                                                          \
+  void name##_input(int ch);                                                   \
+  void name##_render();                                                        \
+  void name##_resize();                                                        \
+  void name##_cleanup();                                                       \
+  extern Model model_##name;
+AM_MAP(X)
+#undef X
+
 #define X(state, name)                                                         \
   void name##_init();                                                          \
   void name##_input(int ch);                                                   \
@@ -30,11 +41,18 @@ typedef struct {
   void name##_resize();                                                        \
   void name##_cleanup();                                                       \
   extern Model model_##name;
-MODEL_MAP(X)
+PM_MAP(X)
 #undef X
 
-#define DEFINE_MODEL(name)                                                     \
-  Model model_##name = {name##_init, name##_input, name##_render,              \
-                        name##_resize, name##_cleanup}
+typedef enum {
+#define X(state, name) STATE_##state,
+  PM_MAP(X)
+#undef X
+      STATE_COUNT,
+  STATE_QUIT
+} GameState;
+
+extern GameState current_state;
+extern GameState next_state;
 
 #endif

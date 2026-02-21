@@ -59,5 +59,3 @@ void log_cleanup() {
     delwin(l_win);
   }
 }
-
-DEFINE_MODEL(log);
