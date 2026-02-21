@@ -4,10 +4,12 @@
 #include "log.h"
 #include "options.h"
 
+#define PATH_OPTIONS "options.txt"
+
 GameOptions current_options = {.log_level = 0, .show_log = true};
 
 void options_load() {
-  FILE *f = fopen("options.txt", "r");
+  FILE *f = fopen(PATH_OPTIONS, "r");
 
   if (!f) {
     log_add(LOG_INFO, "options.txt not found, using default options");
@@ -28,8 +30,8 @@ void options_load() {
   log_add(LOG_INFO, "options loaded");
 }
 
-void options_save() {
-  FILE *f = fopen("options.txt", "w");
+void options_write() {
+  FILE *f = fopen(PATH_OPTIONS, "w");
 
   if (!f)
     return;
