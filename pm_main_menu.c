@@ -82,6 +82,9 @@ void main_menu_resize() {
 
 void main_menu_cleanup() {
   unpost_menu(m_menu);
+  WINDOW *sub = menu_sub(m_menu);
+  if (sub)
+    delwin(sub);
   free_menu(m_menu);
   for (int i = 0; i < 3; ++i)
     free_item(m_items[i]);

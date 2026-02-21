@@ -37,8 +37,9 @@ int main() {
 
   options_load();
 
-  // Always-on models
-  log_init();
+#define X(name) name##_init();
+  AM_MAP(X)
+#undef X
 
   int ch;
 
@@ -66,8 +67,13 @@ int main() {
       if (ch != ERR) {
         if (ch == KEY_RESIZE) {
           erase();
+
+#define X(name) name##_resize();
+          AM_MAP(X)
+#undef X
+
           pm->resize();
-          log_resize();
+
           refresh();
         } else {
           pm->input(ch);
@@ -80,9 +86,13 @@ int main() {
     log_render();
   }
 
-  log_cleanup();
+#define X(name) name##_cleanup();
+  AM_MAP(X)
+#undef X
+
   if (pm)
     pm->cleanup();
+
   endwin();
 
   free_logs();

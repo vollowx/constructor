@@ -49,9 +49,9 @@
 #define OPTIONS_HEIGHT 32
 #define OPTIONS_WIDTH 48
 
-static ITEM **opt_items;
-static MENU *opt_menu;
-static WINDOW *opt_win;
+static ITEM **o_items = NULL;
+static MENU *o_menu = NULL;
+static WINDOW *o_win = NULL;
 
 ITEM *new_caption(const char *title) {
   ITEM *item = new_item(title, "");
@@ -70,27 +70,35 @@ void format_menu_item(char *dest, size_t size, const char *label,
 void rebuild_options_menu() {
   int current_idx = 0;
 
-  if (opt_menu) {
-    ITEM *cur = current_item(opt_menu);
+  if (o_menu) {
+    ITEM *cur = current_item(o_menu);
     if (cur) {
       current_idx = item_index(cur);
     }
-    unpost_menu(opt_menu);
-    free_menu(opt_menu);
+    unpost_menu(o_menu);
+    free_menu(o_menu);
+    o_menu = NULL;
+  }
+  if (o_items) {
+    for (int i = 0; i < OPTIONS_HEIGHT + 1; i++) {
+      free_item(o_items[i]);
+    }
+    free(o_items);
+    o_items = NULL;
   }
 
-  opt_items = (ITEM **)calloc(OPTIONS_HEIGHT + 1, sizeof(ITEM *));
+  o_items = (ITEM **)calloc(OPTIONS_HEIGHT + 1, sizeof(ITEM *));
   int i = 0;
 
-  opt_items[i++] = new_caption("  Game");
-  opt_items[i++] = new_item("Foo", "");
-  opt_items[i++] = new_item("Bar", "");
-  opt_items[i++] = new_item("Baz", "");
+  o_items[i++] = new_caption("  Game");
+  o_items[i++] = new_item("Foo", "");
+  o_items[i++] = new_item("Bar", "");
+  o_items[i++] = new_item("Baz", "");
 
-  opt_items[i++] = new_caption("  Display");
-  opt_items[i++] = new_item("Zoom", "");
+  o_items[i++] = new_caption("  Display");
+  o_items[i++] = new_item("Zoom", "");
 
-  opt_items[i++] = new_caption("  Other");
+  o_items[i++] = new_caption("  Other");
 
   static char log_level_line[64], log_show_line[64], log_save_line[64];
   const char *lvls[] = {"<Information>", "<Warning>", "<Error>"};
@@ -102,46 +110,50 @@ void rebuild_options_menu() {
   format_menu_item(log_save_line, sizeof(log_save_line), "Save log locally",
                    current_options.save_log ? "[x]" : "[ ]");
 
-  opt_items[i++] = new_item(log_level_line, "");
-  opt_items[i++] = new_item(log_show_line, "");
-  opt_items[i++] = new_item(log_save_line, "");
-  opt_items[i++] = new_item("Clear logs", "");
-  opt_items[i++] = new_item("Clear local logs", "");
+  o_items[i++] = new_item(log_level_line, "");
+  o_items[i++] = new_item(log_show_line, "");
+  o_items[i++] = new_item(log_save_line, "");
+  o_items[i++] = new_item("Clear logs", "");
+  o_items[i++] = new_item("Clear local logs", "");
 
-  opt_items[i++] = new_caption(" ");
-  opt_items[i++] = new_item("Save", "");
-  opt_items[i++] = new_item("Cancel", "");
-  opt_items[i++] = NULL;
+  o_items[i++] = new_caption(" ");
+  o_items[i++] = new_item("Save", "");
+  o_items[i++] = new_item("Cancel", "");
+  o_items[i++] = NULL;
 
-  opt_menu = new_menu(opt_items);
-  set_menu_win(opt_menu, opt_win);
-  set_menu_sub(opt_menu, derwin(opt_win, OPTIONS_HEIGHT, OPTIONS_WIDTH, 2, 1));
-  set_menu_mark(opt_menu, " > ");
-  set_current_item(opt_menu, opt_items[current_idx]);
+  o_menu = new_menu(o_items);
+  set_menu_win(o_menu, o_win);
+  set_menu_sub(o_menu, derwin(o_win, OPTIONS_HEIGHT, OPTIONS_WIDTH, 2, 1));
+  set_menu_mark(o_menu, " > ");
+  set_current_item(o_menu, o_items[current_idx]);
 
-  post_menu(opt_menu);
+  post_menu(o_menu);
 }
 
 void options_init() {
   info("primary model switched to options");
 
-  opt_win =
+  o_win =
       newwin(OPTIONS_HEIGHT + 4, OPTIONS_WIDTH + 4,
              (LINES + 2 - OPTIONS_HEIGHT) / 2, (COLS + 2 - OPTIONS_WIDTH) / 2);
-  keypad(opt_win, TRUE);
+  keypad(o_win, TRUE);
   rebuild_options_menu();
 }
 
 void options_input(int ch) {
   switch (ch) {
   case KEY_DOWN:
-    menu_driver(opt_menu, REQ_DOWN_ITEM);
+    menu_driver(o_menu, REQ_DOWN_ITEM);
     break;
   case KEY_UP:
-    menu_driver(opt_menu, REQ_UP_ITEM);
+    menu_driver(o_menu, REQ_UP_ITEM);
+    break;
+  case 'q':
+    options_load();
+    next_state = STATE_MAIN_MENU;
     break;
   case 10: {
-    ITEM *cur = current_item(opt_menu);
+    ITEM *cur = current_item(o_menu);
     const char *name = item_name(cur);
 
     if (strstr(name, "Show log level")) {
@@ -165,31 +177,37 @@ void options_input(int ch) {
 }
 
 void options_render() {
-  box(opt_win, 0, 0);
-  mvwprintw(opt_win, 0, 3, " Options ");
-  wrefresh(opt_win);
-}
-
-void options_cleanup() {
-  if (opt_menu) {
-    unpost_menu(opt_menu);
-    free_menu(opt_menu);
-    opt_menu = NULL;
-  }
-  if (opt_items) {
-    for (int i = 0; opt_items[i]; i++)
-      free_item(opt_items[i]);
-    free(opt_items);
-    opt_items = NULL;
-  }
-  if (opt_win) {
-    delwin(opt_win);
-    opt_win = NULL;
-  }
+  box(o_win, 0, 0);
+  mvwprintw(o_win, 0, 3, " Options ");
+  wrefresh(o_win);
 }
 
 void options_resize() {
-  if (opt_win)
-    mvwin(opt_win, (LINES + 2 - OPTIONS_HEIGHT) / 2,
+  if (o_win)
+    mvwin(o_win, (LINES + 2 - OPTIONS_HEIGHT) / 2,
           (COLS + 2 - OPTIONS_WIDTH) / 2);
+}
+
+void options_cleanup() {
+  if (o_menu) {
+    unpost_menu(o_menu);
+
+    WINDOW *sub = menu_sub(o_menu);
+    if (sub)
+      delwin(sub);
+
+    free_menu(o_menu);
+    o_menu = NULL;
+  }
+  if (o_items) {
+    for (int i = 0; i < OPTIONS_HEIGHT + 1; i++) {
+      free_item(o_items[i]);
+    }
+    free(o_items);
+    o_items = NULL;
+  }
+  if (o_win) {
+    delwin(o_win);
+    o_win = NULL;
+  }
 }
