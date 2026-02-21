@@ -12,7 +12,7 @@
 #define SAVE_VERSION 1
 
 static void get_path(int slot, char *buf, size_t len) {
-  snprintf(buf, len, "save_%d.dat", slot);
+  snprintf(buf, len, "save%d.dat", slot);
 }
 
 static SaveResult map_write(const Map *map, FILE *fp) {
@@ -104,7 +104,7 @@ SaveResult save_write(const Save *self, int slot) {
   return res;
 }
 
-static SaveResult map_read(Game *game, FILE *fp) {
+static SaveResult map_read(Map *map, FILE *fp) {
   size_t w, h;
   if (fread(&w, sizeof(size_t), 1, fp) != 1)
     return SAVE_ERR_READ;
@@ -112,22 +112,21 @@ static SaveResult map_read(Game *game, FILE *fp) {
     return SAVE_ERR_READ;
 
   // Use the proper engine functions to clear and rebuild the map
-  if (game->map) {
-    free_map(game->map);
+  if (map) {
+    free_map(map);
   }
-  game->map = new_map(h, w);
-  if (!game->map)
+  map = new_map(h, w);
+  if (!map)
     return SAVE_ERR_READ;
 
   for (size_t y = 0; y < h; ++y) {
     for (size_t x = 0; x < w; ++x) {
-      if (fread(&game->map->cells[y][x].elevation, sizeof(Elevation), 1, fp) !=
-          1) {
+      if (fread(&map->cells[y][x].elevation, sizeof(Elevation), 1, fp) != 1) {
         return SAVE_ERR_READ;
       }
       // Pointers safely zeroed inside new_map, but explicit is good:
-      game->map->cells[y][x].entity = NULL;
-      game->map->cells[y][x].object = NULL;
+      map->cells[y][x].entity = NULL;
+      map->cells[y][x].object = NULL;
     }
   }
   return SAVE_OK;
@@ -166,7 +165,7 @@ SaveResult save_load(Save *self, int slot) {
   info("[save] Header valid with player: %s", self->header.player_name);
 
   // Read Map
-  if (map_read(self->game, fp) != SAVE_OK) {
+  if (map_read(self->game->map, fp) != SAVE_OK) {
     error("[save] Failed reading map");
     fclose(fp);
     return SAVE_ERR_READ;
