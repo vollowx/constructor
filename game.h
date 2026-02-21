@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 // Order:
@@ -20,9 +21,9 @@ typedef enum {
 
 typedef enum {
   ITEM_RESOURCE,   // Ore, wood
+  ITEM_PLACEABLE,  // Seeds, furniture
   ITEM_CONSUMABLE, // Food, potions
   ITEM_EQUIPMENT,  // Tools, armor
-  ITEM_PLACEABLE   // Seeds, furniture
 } ItemType;
 
 typedef enum {
@@ -33,7 +34,7 @@ typedef enum {
 } EntityType;
 
 typedef struct {
-  int id;
+  uint16_t id;
   ItemType type;
   char name[32];
   int max_stack;

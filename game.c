@@ -2,10 +2,19 @@
 #include "helpers.h"
 
 static const ItemDef ITEM_DATABASE[] = {
-    {.id = 0, .name = "Iron Ore", .type = ITEM_RESOURCE, .max_stack = 64},
-    {.id = 1, .name = "Gold Ore", .type = ITEM_RESOURCE, .max_stack = 64},
-    {.id = 2, .name = "Apple", .type = ITEM_CONSUMABLE, .max_stack = 20},
-    {.id = 3, .name = "Pickaxe", .type = ITEM_EQUIPMENT, .max_stack = 1}};
+    {.id = 0, .name = "Copper Ore", .type = ITEM_RESOURCE, .max_stack = 64},
+    {.id = 1, .name = "Iron Ore", .type = ITEM_RESOURCE, .max_stack = 64},
+    {.id = 2, .name = "Gold Ore", .type = ITEM_RESOURCE, .max_stack = 64},
+
+    {.id = 10000, .name = "Brick", .type = ITEM_PLACEABLE, .max_stack = 64},
+
+    {.id = 20000, .name = "Apple", .type = ITEM_CONSUMABLE, .max_stack = 24},
+    {.id = 20001, .name = "Orange", .type = ITEM_CONSUMABLE, .max_stack = 24},
+    {.id = 20002, .name = "Pear", .type = ITEM_CONSUMABLE, .max_stack = 24},
+
+    {.id = 30000, .name = "Copper Axe", .type = ITEM_EQUIPMENT},
+    {.id = 30001, .name = "Iron Axe", .type = ITEM_EQUIPMENT},
+    {.id = 30002, .name = "Gold Axe", .type = ITEM_EQUIPMENT}};
 
 const ItemDef *item_get_def(int id) {
   for (size_t i = 0; i < sizeof(ITEM_DATABASE) / sizeof(ItemDef); ++i) {
