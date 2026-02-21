@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "log.h"
 #include "models.h"
 #include "options.h"
@@ -9,7 +11,10 @@ void log_init() {
   log_win = newwin(height, COLS, LINES - height, 0);
 }
 
-void log_input(int ch) {}
+void log_input(int ch) {
+  (void)ch;
+  assert(0 && "UNREACHABLE");
+}
 
 void log_render() {
   if (!log_win || !current_options.show_log)
@@ -21,7 +26,7 @@ void log_render() {
   int display_row = 1;
 
   for (int i = 0; i < log_count; i++) {
-    if (logs[i].level < current_options.log_level) {
+    if ((int)logs[i].level < current_options.log_level) {
       continue;
     }
 
