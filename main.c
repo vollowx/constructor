@@ -1,6 +1,7 @@
 #include "log.h"
 #include "models.h"
 #include "options.h"
+#include "save.h"
 #include "states.h"
 
 GameState next_state = STATE_MAIN_MENU;
@@ -29,10 +30,15 @@ int main() {
   nodelay(stdscr, TRUE);
   curs_set(0);
 
-  log_init();
-  log_add(LOG_INFO, "TUI initialized");
+  start_color();
+  init_pair(1, COLOR_BLUE, COLOR_BLACK);
+  init_pair(2, COLOR_YELLOW, COLOR_BLACK);
+  init_pair(3, COLOR_RED, COLOR_BLACK);
 
   options_load();
+
+  // Always-on models
+  log_init();
 
   int ch;
 
@@ -78,6 +84,8 @@ int main() {
   if (current_model)
     current_model->cleanup();
   endwin();
+
+  free_logs();
 
   return 0;
 }

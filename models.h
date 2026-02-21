@@ -15,6 +15,7 @@ typedef struct {
 #define MODEL_MAP(X)                                                           \
   X(UNREACHABLE, log)                                                          \
   X(MAIN_MENU, main_menu)                                                      \
+  X(SAVES, saves)                                                        \
   X(GAMEPLAY, gameplay)                                                        \
   X(OPTIONS, options)
 

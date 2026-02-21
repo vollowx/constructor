@@ -1,64 +1,62 @@
 #include <assert.h>
+#include <ncurses.h>
 
+#include "helpers.h"
 #include "log.h"
 #include "models.h"
 #include "options.h"
 
-WINDOW *log_win = NULL;
+WINDOW *l_win = NULL;
 
 void log_init() {
-  int height = LOG_CAPACITY + 1;
-  log_win = newwin(height, COLS, LINES - height, 0);
+  int height = LOG_UI_CAPACITY + 1;
+  l_win = newwin(height, COLS, LINES - height, 0);
 }
 
 void log_input(int ch) {
-  (void)ch;
-  assert(0 && "UNREACHABLE");
+  UNUSED(ch);
+  assert(0 && "Unreachable");
 }
 
 void log_render() {
-  if (!log_win || !current_options.show_log)
+  if (!l_win || !current_options.show_log)
     return;
 
-  werase(log_win);
-  mvwhline(log_win, 0, 0, ACS_HLINE, COLS);
+  werase(l_win);
+  mvwhline(l_win, 0, 0, ACS_HLINE, COLS);
 
-  int display_row = 1;
+  size_t line = LOG_UI_CAPACITY;
+  size_t i = logs.count;
 
-  for (int i = 0; i < log_count; i++) {
-    if ((int)logs[i].level < current_options.log_level) {
-      continue;
+  while (i > 0 && line > 0) {
+    const Log *log = &logs.items[--i];
+
+    if ((int)log->level >= current_options.log_level) {
+      int color = (log->level == LOG_ERROR)     ? 3
+                  : (log->level == LOG_WARNING) ? 2
+                                                : 1;
+
+      wattron(l_win, COLOR_PAIR(color));
+      mvwprintw(l_win, line--, 0, "%s", log->msg);
+      wattroff(l_win, COLOR_PAIR(color));
     }
-
-    const char *prefix = "[INFO]";
-    if (logs[i].level == LOG_WARNING)
-      prefix = "[WARN]";
-    if (logs[i].level == LOG_ERROR)
-      prefix = "[ERR ]";
-
-    // Print the log and move to the next row
-    mvwprintw(log_win, display_row, 0, "%s %s", prefix, logs[i].msg);
-    display_row++;
-
-    if (display_row > LOG_CAPACITY)
-      break;
   }
 
-  wrefresh(log_win);
+  wrefresh(l_win);
 }
 
 void log_resize() {
-  if (!log_win)
+  if (!l_win)
     return;
 
-  int height = LOG_CAPACITY + 1;
-  wresize(log_win, height, COLS);
-  mvwin(log_win, LINES - height, 0);
+  int height = LOG_UI_CAPACITY + 1;
+  wresize(l_win, height, COLS);
+  mvwin(l_win, LINES - height, 0);
 }
 
 void log_cleanup() {
-  if (log_win) {
-    delwin(log_win);
+  if (l_win) {
+    delwin(l_win);
   }
 }
 

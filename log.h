@@ -3,19 +3,29 @@
 
 #include <ncurses.h>
 
+#define LOG_MAX_LENGTH 128
+#define LOG_UI_CAPACITY 5
+
+#define info(fmt, ...) log_message(LOG_INFO, fmt, ##__VA_ARGS__)
+#define warn(fmt, ...) log_message(LOG_WARNING, fmt, ##__VA_ARGS__)
+#define error(fmt, ...) log_message(LOG_ERROR, fmt, ##__VA_ARGS__)
+
 typedef enum { LOG_INFO, LOG_WARNING, LOG_ERROR } LogLevel;
 
 typedef struct {
   LogLevel level;
-  char msg[128];
-} LogEntry;
+  const char *msg;
+} Log;
 
-#define LOG_CAPACITY 5
-#define log_add(level, fmt, ...) log_message(level, fmt, ##__VA_ARGS__)
+typedef struct {
+  Log *items;
+  size_t capacity;
+  size_t count;
+} Logs;
 
 void log_message(LogLevel level, const char *fmt, ...);
+void free_logs();
 
-extern LogEntry logs[LOG_CAPACITY];
-extern int log_count;
+extern Logs logs;
 
 #endif

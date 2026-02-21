@@ -1,22 +1,29 @@
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
+#include "helpers.h"
 #include "log.h"
 
-LogEntry logs[LOG_CAPACITY];
-int log_count = 0;
+Logs logs = {0};
 
 void log_message(LogLevel level, const char *fmt, ...) {
-  if (log_count < LOG_CAPACITY) {
-    log_count++;
-  }
-  for (int i = log_count - 1; i > 0; i--) {
-    logs[i] = logs[i - 1];
-  }
+  char msg[LOG_MAX_LENGTH + 1];
 
-  logs[0].level = level;
   va_list args;
   va_start(args, fmt);
-  vsnprintf(logs[0].msg, 127, fmt, args);
+  vsnprintf(msg, LOG_MAX_LENGTH, fmt, args);
   va_end(args);
+
+  Log log = {0};
+  log.level = level;
+  log.msg = strdup(msg);
+
+  da_append(&logs, log);
+}
+
+void free_logs() {
+  da_free(logs);
+  logs.count = 0;
+  logs.capacity = 0;
 }
