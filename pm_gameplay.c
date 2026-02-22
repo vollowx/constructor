@@ -106,8 +106,7 @@ void gameplay_render() {
   size_t vx = (target_vx < 0) ? 0 : (size_t)target_vx;
   size_t vy = (target_vy < 0) ? 0 : (size_t)target_vy;
 
-  game_generate_area(current_save.game, vx, vy, vx + sw, vy + sh,
-                     current_save.header.timestamp);
+  game_gen_area(current_save.game, vy, vx, vy + sh, vx + sw);
 
   for (int y = 0; y < sh; y++) {
     for (int x = 0; x < sw; x++) {

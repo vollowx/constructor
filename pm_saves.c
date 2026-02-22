@@ -93,7 +93,9 @@ void saves_input(int ch) {
       Game game = {0};
       game_init(&game);
       Save save = {0};
-      save_init(&save, &game, "Char");
+      save.game = &game;
+      save_init(&save);
+      strcpy(save.header.player_name, game.player->name);
       save_save(&save, slot);
       free_game(&game);
 

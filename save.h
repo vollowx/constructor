@@ -18,8 +18,8 @@ typedef enum {
 typedef struct {
   uint32_t magic;
   uint32_t version;
-  char player_name[32];
   uint32_t timestamp;
+  char player_name[32];
 } SaveHeader;
 
 typedef struct {
@@ -34,7 +34,7 @@ typedef struct {
 
 SaveResult save_load(Save *save, int slot);
 SaveResult save_save(const Save *save, int slot);
-void save_init(Save *save, Game *game, const char *player_name);
+void save_init(Save *save);
 
 SavePreview get_slot_preview(int slot);
 

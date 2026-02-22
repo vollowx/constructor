@@ -121,8 +121,9 @@ typedef struct {
 } Map;
 
 typedef struct {
-  Map *map;
+  uint32_t seed;
 
+  Map *map;
   Entity *player;
   Entities entities;
 } Game;
@@ -142,8 +143,8 @@ void free_map(Map *map);
 
 void free_game(Game *game);
 void game_init(Game *game);
-void game_generate_area(Game *game, size_t start_x, size_t start_y,
-                        size_t end_x, size_t end_y, uint32_t seed);
+void game_gen_area(Game *game, size_t start_y, size_t start_x, size_t end_y,
+                   size_t end_x);
 void game_tick(Game *game);
 
 #endif

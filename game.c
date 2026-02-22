@@ -1,3 +1,5 @@
+#include <time.h>
+
 #include <ncurses.h>
 
 #include "game.h"
@@ -114,17 +116,14 @@ void free_map(Map *map) {
   free(map);
 }
 
+// TODO: Chunk game both in struct and file
 void game_init(Game *game) {
-  // 1. Initialize the Map
   game->map = new_map(2048, 2048);
 
-  // 2. Initialize the Entities container
   game->entities.items = NULL;
   game->entities.count = 0;
   game->entities.capacity = 0;
-  da_reserve(&game->entities, NOB_DA_INIT_CAP);
 
-  // 3. Create the Player
   Entity *player = malloc(sizeof(Entity));
   memset(player, 0, sizeof(Entity));
 
@@ -132,22 +131,32 @@ void game_init(Game *game) {
   player->type = ENT_PLAYER;
   player->health = 100;
   player->health_max = 100;
-  player->x = 1024;
-  player->y = 1024;
   player->z = ELEV_GROUND;
   strncpy(player->name, "Default Name", sizeof(player->name) - 1);
 
-  // Initialize Player Inventory
   player->inventory.count = 0;
   player->inventory.capacity = 8;
   player->inventory.items =
       malloc(sizeof(ItemStack) * player->inventory.capacity);
 
-  // 4. Register Player in the Game
   da_append(&game->entities, player);
   game->player = player;
 
-  // 5. Link Player to the Map grid
+  srand((unsigned int)time(NULL));
+  game->seed = ((uint32_t)rand() << 16) | (uint32_t)rand();
+
+  size_t py = 1024, px = 1024, y_offset = 0;
+  game_gen_area(game, py - 256, px - 256, py + 256, px + 256);
+
+  // TODO: Fails in a rather small possibility
+  while (game->map->cells[py + y_offset][px].elevation != ELEV_GROUND &&
+         y_offset < 256) {
+    ++y_offset;
+  }
+  py += y_offset;
+
+  player->y = py;
+  player->x = px;
   game->map->cells[player->y][player->x].entity = player;
 }
 
@@ -215,9 +224,8 @@ float smooth_noise(float x, float y, uint32_t seed) {
   return lerp(a, b, ux) + (c - a) * uy * (1 - ux) + (d - b) * ux * uy;
 }
 
-void game_generate_area(Game *game, size_t start_x, size_t start_y,
-
-                        size_t end_x, size_t end_y, uint32_t seed) {
+void game_gen_area(Game *game, size_t start_y, size_t start_x, size_t end_y,
+                   size_t end_x) {
   if (!game || !game->map)
     return;
   Map *map = game->map;
@@ -231,7 +239,8 @@ void game_generate_area(Game *game, size_t start_x, size_t start_y,
       if (cell->elevation == ELEV_NONE) {
         // Scale controls island size: higher = smaller, more frequent islands
         float scale = 0.15f;
-        float val = smooth_noise((float)x * scale, (float)y * scale, seed);
+        float val =
+            smooth_noise((float)x * scale, (float)y * scale, game->seed);
 
         // Thresholds for Forager-style layers
         if (val > 0.55f) {
@@ -247,8 +256,8 @@ void game_generate_area(Game *game, size_t start_x, size_t start_y,
         if (cell->elevation == ELEV_GROUND) {
           // Use a different seed offset for resources so they don't follow the
           // coastline perfectly
-          uint32_t res_h =
-              seed ^ ((uint32_t)x * 123456789U) ^ ((uint32_t)y * 987654321U);
+          uint32_t res_h = game->seed ^ ((uint32_t)x * 123456789U) ^
+                           ((uint32_t)y * 987654321U);
           if ((res_h % 100) < 5) {
             Entity *res = calloc(1, sizeof(Entity));
             res->type = ENT_MOB;

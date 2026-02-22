@@ -237,21 +237,10 @@ SaveResult save_save(const Save *self, int slot) {
   return res;
 }
 
-void save_init(Save *self, Game *game, const char *player_name) {
-  self->game = game;
-
+void save_init(Save *self) {
   self->header.magic = SAVE_MAGIC;
   self->header.version = SAVE_VERSION;
   self->header.timestamp = (uint32_t)time(NULL);
-
-  memset(self->header.player_name, 0, sizeof(self->header.player_name));
-  if (player_name) {
-    strncpy(self->header.player_name, player_name,
-            sizeof(self->header.player_name) - 1);
-    if (game->player) {
-      strncpy(game->player->name, player_name, sizeof(game->player->name) - 1);
-    }
-  }
 }
 
 SavePreview get_slot_preview(int slot) {
