@@ -8,45 +8,6 @@
 #include "models.h"
 #include "options.h"
 
-// Looks like:
-//
-//  ┌── Options ─────────────────────────(52)──────────┐
-//  │                                    (48)          │
-//  │ >   Game                                         │
-//  │   Foo                                            │
-//  │   Bar                                            │
-//  │   Baz                                            │
-//  │     Display                                      │
-//  │   Zoom                                           │
-//  │     Other                                        │
-//  │   Show log level                  <Information>  │
-//  │   Show log window                           [x]  │
-//  │                                                  │
-//  │   Save                                           │
-//  │   Cancel                                         │
-//  │                                                  │
-//  │                                                  │
-//  │                                         (32)   (36)
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  │                                                  │
-//  └──────────────────────────────────────────────────┘
-
 #define OPTIONS_HEIGHT 32
 #define OPTIONS_WIDTH 56
 

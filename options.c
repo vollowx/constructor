@@ -12,7 +12,7 @@ void options_load() {
   FILE *f = fopen(PATH_OPTIONS, "r");
 
   if (!f) {
-    info("[options] %s not found, fallback to default options", PATH_OPTIONS);
+    warn("[options] %s not found, falling back to default options", PATH_OPTIONS);
     return;
   }
   char key[32];

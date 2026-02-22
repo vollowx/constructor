@@ -1,37 +1,71 @@
+#include <ncurses.h>
+
 #include "game.h"
 #include "helpers.h"
 
-static const ItemDef ITEM_DATABASE[] = {
-    {.id = 0, .name = "Copper Ore", .type = ITEM_RESOURCE, .max_stack = 64},
-    {.id = 1, .name = "Iron Ore", .type = ITEM_RESOURCE, .max_stack = 64},
-    {.id = 2, .name = "Gold Ore", .type = ITEM_RESOURCE, .max_stack = 64},
+// clang-format off
+const ItemDef ITEM_DB[] = {
+    {.id = 0,     .type = ITEM_RESOURCE,   .name = "Copper Ore", .symbol = 'c', .fg = COLOR_YELLOW,  .max_stack = 64},
+    {.id = 1,     .type = ITEM_RESOURCE,   .name = "Iron Ore",   .symbol = 'o', .fg = COLOR_WHITE,   .max_stack = 64},
+    {.id = 2,     .type = ITEM_RESOURCE,   .name = "Gold Ore",   .symbol = 'o', .fg = COLOR_YELLOW,  .max_stack = 64},
+    {.id = 10000, .type = ITEM_PLACEABLE,  .name = "Brick",      .symbol = 'N', .fg = COLOR_WHITE,   .max_stack = 64},
+    {.id = 20000, .type = ITEM_CONSUMABLE, .name = "Apple",      .symbol = 'O', .fg = COLOR_RED,     .max_stack = 24},
+    {.id = 20001, .type = ITEM_CONSUMABLE, .name = "Orange",     .symbol = 'O', .fg = COLOR_YELLOW,  .max_stack = 24},
+    {.id = 20002, .type = ITEM_CONSUMABLE, .name = "Berry",      .symbol = 'o', .fg = COLOR_YELLOW,  .max_stack = 24},
+    {.id = 30000, .type = ITEM_EQUIPMENT,  .name = "Copper Axe", .symbol = 'F', .fg = COLOR_YELLOW},
+    {.id = 30001, .type = ITEM_EQUIPMENT,  .name = "Iron Axe",   .symbol = 'F', .fg = COLOR_WHITE },
+    {.id = 30002, .type = ITEM_EQUIPMENT,  .name = "Gold Axe",   .symbol = 'F', .fg = COLOR_YELLOW},
+};
 
-    {.id = 10000, .name = "Brick", .type = ITEM_PLACEABLE, .max_stack = 64},
-
-    {.id = 20000, .name = "Apple", .type = ITEM_CONSUMABLE, .max_stack = 24},
-    {.id = 20001, .name = "Orange", .type = ITEM_CONSUMABLE, .max_stack = 24},
-    {.id = 20002, .name = "Pear", .type = ITEM_CONSUMABLE, .max_stack = 24},
-
-    {.id = 30000, .name = "Copper Axe", .type = ITEM_EQUIPMENT},
-    {.id = 30001, .name = "Iron Axe", .type = ITEM_EQUIPMENT},
-    {.id = 30002, .name = "Gold Axe", .type = ITEM_EQUIPMENT}};
+const ObjectDef OBJ_DB[] = {
+    {.id = 0, .name = "Stone Boulder", .max_health = 5,  .is_passable = false, .symbol = 'O', .fg = COLOR_BLACK, .bg = COLOR_WHITE },
+    {.id = 1, .name = "Wood Bridge",   .max_health = 1,  .is_passable = true , .symbol = '#', .fg = COLOR_BLACK, .bg = COLOR_YELLOW},
+    {.id = 2, .name = "Furnace",       .max_health = 10, .is_passable = false, .symbol = '&', .fg = COLOR_BLACK, .bg = COLOR_WHITE },
+};
+// clang-format on
 
 const ItemDef *item_get_def(int id) {
-  for (size_t i = 0; i < sizeof(ITEM_DATABASE) / sizeof(ItemDef); ++i) {
-    if (ITEM_DATABASE[i].id == id)
-      return &ITEM_DATABASE[i];
+  for (size_t i = 0; i < sizeof(ITEM_DB) / sizeof(ItemDef); ++i) {
+    if (ITEM_DB[i].id == id)
+      return &ITEM_DB[i];
   }
   return NULL;
 }
 
-void entity_move(Entity *e, int x, int y, Map *map) {
+char item_get_symbol(int id) {
+  const ItemDef *def = item_get_def(id);
+  return def ? def->symbol : '?';
+}
+
+void entity_move(Entity *e, int dx, int dy, Map *map) {
+  if (!e || !map)
+    return;
+
+  if (dx < 0 && e->x < (size_t)abs(dx))
+    return;
+  if (dy < 0 && e->y < (size_t)abs(dy))
+    return;
+
+  size_t new_x = e->x + dx;
+  size_t new_y = e->y + dy;
+
+  if (new_x >= map->w || new_y >= map->h)
+    return;
+
+  MapCell *target = &map->cells[new_y][new_x];
+
+  if (target->entity != NULL)
+    return;
+  if (target->elevation == ELEV_DEEP_WATER || target->elevation == ELEV_WATER)
+    return;
+
   map->cells[e->y][e->x].entity = NULL;
 
-  e->x = x;
-  e->y = y;
-  e->z = map->cells[y][x].elevation;
+  e->x = new_x;
+  e->y = new_y;
+  e->z = target->elevation;
 
-  map->cells[y][x].entity = e;
+  target->entity = e;
 }
 
 Map *new_map(size_t height, size_t width) {
@@ -82,7 +116,7 @@ void free_map(Map *map) {
 
 void game_init(Game *game) {
   // 1. Initialize the Map
-  game->map = new_map(80, 24);
+  game->map = new_map(2048, 2048);
 
   // 2. Initialize the Entities container
   game->entities.items = NULL;
@@ -98,10 +132,10 @@ void game_init(Game *game) {
   player->type = ENT_PLAYER;
   player->health = 100;
   player->health_max = 100;
-  player->x = 5;
-  player->y = 5;
+  player->x = 1024;
+  player->y = 1024;
   player->z = ELEV_GROUND;
-  strncpy(player->name, "Hero", sizeof(player->name) - 1);
+  strncpy(player->name, "Default Name", sizeof(player->name) - 1);
 
   // Initialize Player Inventory
   player->inventory.count = 0;
@@ -144,4 +178,92 @@ void free_game(Game *game) {
   game->entities.count = 0;
   game->entities.capacity = 0;
   game->player = NULL;
+}
+
+float noise2d(int x, int y, uint32_t seed) {
+  int n = x + y * 57 + seed;
+  n = (n << 13) ^ n;
+  // Standard deterministic hash to get a float between 0 and 1
+  float res =
+      (1.0 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) /
+                 1073741824.0);
+  return (res + 1.0f) / 2.0f;
+}
+
+// Linearly interpolate between a and b
+float lerp(float a, float b, float t) { return a + t * (b - a); }
+
+// Smoothly interpolate for a more organic feel
+float smooth_noise(float x, float y, uint32_t seed) {
+  int i = (int)x;
+  int j = (int)y;
+  float fx = x - i;
+  float fy = y - j;
+
+  // Corner values
+  float a = noise2d(i, j, seed);
+
+  float b = noise2d(i + 1, j, seed);
+  float c = noise2d(i, j + 1, seed);
+
+  float d = noise2d(i + 1, j + 1, seed);
+
+  // Bi-linear interpolation
+  float ux = fx * fx * (3 - 2 * fx);
+  float uy = fy * fy * (3 - 2 * fy);
+
+  return lerp(a, b, ux) + (c - a) * uy * (1 - ux) + (d - b) * ux * uy;
+}
+
+void game_generate_area(Game *game, size_t start_x, size_t start_y,
+
+                        size_t end_x, size_t end_y, uint32_t seed) {
+  if (!game || !game->map)
+    return;
+  Map *map = game->map;
+
+  for (size_t y = start_y; y < end_y && y < map->h; y++) {
+    for (size_t x = start_x; x < end_x && x < map->w; x++) {
+      MapCell *cell = &map->cells[y][x];
+
+      // Only generate if untouched
+
+      if (cell->elevation == ELEV_NONE) {
+        // Scale controls island size: higher = smaller, more frequent islands
+        float scale = 0.15f;
+        float val = smooth_noise((float)x * scale, (float)y * scale, seed);
+
+        // Thresholds for Forager-style layers
+        if (val > 0.55f) {
+
+          cell->elevation = ELEV_GROUND;
+        } else if (val > 0.45f) {
+          cell->elevation = ELEV_WATER;
+        } else {
+          cell->elevation = ELEV_DEEP_WATER;
+        }
+
+        // RESOURCE PASS: Only on new ground
+        if (cell->elevation == ELEV_GROUND) {
+          // Use a different seed offset for resources so they don't follow the
+          // coastline perfectly
+          uint32_t res_h =
+              seed ^ ((uint32_t)x * 123456789U) ^ ((uint32_t)y * 987654321U);
+          if ((res_h % 100) < 5) {
+            Entity *res = calloc(1, sizeof(Entity));
+            res->type = ENT_MOB;
+            res->x = x;
+            res->y = y;
+            int pick = (res_h >> 8) % 3;
+            res->id = ITEM_DB[pick].id;
+
+            strncpy(res->name, ITEM_DB[pick].name, 31);
+
+            cell->entity = res;
+            da_append(&game->entities, res);
+          }
+        }
+      }
+    }
+  }
 }

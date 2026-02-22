@@ -9,8 +9,6 @@ typedef struct {
   bool show_log;
 } GameOptions;
 
-extern GameOptions current_options;
-
 void options_load();
 void options_save();
 

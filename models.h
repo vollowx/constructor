@@ -52,7 +52,4 @@ typedef enum {
   STATE_QUIT
 } GameState;
 
-extern GameState current_state;
-extern GameState next_state;
-
 #endif

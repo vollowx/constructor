@@ -1,8 +1,9 @@
+#include "fcp.h"
 #include "log.h"
 #include "models.h"
 #include "options.h"
-#include "save.h"
 
+int current_slot = -1;
 GameState next_state = STATE_MAIN_MENU;
 GameState current_state = (GameState)-1;
 // Current primary model
@@ -31,9 +32,7 @@ int main() {
   curs_set(0);
 
   start_color();
-  init_pair(1, COLOR_BLUE, COLOR_BLACK);
-  init_pair(2, COLOR_YELLOW, COLOR_BLACK);
-  init_pair(3, COLOR_RED, COLOR_BLACK);
+  fcp_init();
 
   options_load();
 

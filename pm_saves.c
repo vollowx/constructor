@@ -87,7 +87,7 @@ void saves_input(int ch) {
 
   case 10:
     if (previews[slot].exists) {
-      // current_slot = idx
+      current_slot = slot;
       next_state = STATE_GAMEPLAY;
     } else {
       Game game = {0};

@@ -10,7 +10,11 @@
 #define warn(fmt, ...) log_message(LOG_WARNING, fmt, ##__VA_ARGS__)
 #define error(fmt, ...) log_message(LOG_ERROR, fmt, ##__VA_ARGS__)
 
-typedef enum { LOG_INFO, LOG_WARNING, LOG_ERROR } LogLevel;
+typedef enum {
+  LOG_INFO = 0,
+  LOG_WARNING,
+  LOG_ERROR,
+} LogLevel;
 
 typedef struct {
   LogLevel level;
@@ -25,7 +29,5 @@ typedef struct {
 
 void log_message(LogLevel level, const char *fmt, ...);
 void free_logs();
-
-extern Logs logs;
 
 #endif

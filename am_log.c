@@ -1,14 +1,20 @@
 #include <assert.h>
 #include <ncurses.h>
 
+#include "fcp.h"
 #include "helpers.h"
 #include "log.h"
 #include "models.h"
 #include "options.h"
 
 WINDOW *l_win = NULL;
+static short log_cp[3];
 
 void log_init() {
+  log_cp[LOG_INFO] = fcp_get(COLOR_BLUE, COLOR_BLACK);
+  log_cp[LOG_WARNING] = fcp_get(COLOR_YELLOW, COLOR_BLACK);
+  log_cp[LOG_ERROR] = fcp_get(COLOR_RED, COLOR_BLACK);
+
   int height = LOG_UI_CAPACITY + 1;
   l_win = newwin(height, COLS, LINES - height, 0);
 }
@@ -32,13 +38,10 @@ void log_render() {
     const Log *log = &logs.items[--i];
 
     if ((int)log->level >= current_options.log_level) {
-      int color = (log->level == LOG_ERROR)     ? 3
-                  : (log->level == LOG_WARNING) ? 2
-                                                : 1;
-
-      wattron(l_win, COLOR_PAIR(color));
+      short cp = log_cp[log->level];
+      wattron(l_win, COLOR_PAIR(cp));
       mvwprintw(l_win, line--, 0, "%s", log->msg);
-      wattroff(l_win, COLOR_PAIR(color));
+      wattroff(l_win, COLOR_PAIR(cp));
     }
   }
 

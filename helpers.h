@@ -27,6 +27,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "log.h"
+#include "models.h"
+#include "options.h"
+
+extern GameOptions current_options;
+extern int current_slot;
+extern GameState current_state;
+extern GameState next_state;
+extern Logs logs;
+
 #define UNUSED (void)
 
 #define free_menu_ctx(win, menu, items, n_items, owns_labels)                  \

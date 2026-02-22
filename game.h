@@ -6,12 +6,35 @@
 #include <stdlib.h>
 
 // Order:
-// - item
-// - entity
-// - map
-// - game
+// 1. item
+// 2. entity
+// 3. object
+// 4. map
+// 5. game
+//
+// Game game = {
+//   Entity *player
+//   Entities entities
+//
+//   Map map = {
+//     w, h
+//     [][]MapCell cells = [][]{
+//       Elevation elevation
+//       MapObject object = {
+//         id - the id in ObjectDef
+//         x, y
+//         health
+//       }
+//       Entity entity = {
+//         x, y
+//         name
+//       }
+//     }
+//   }
+// }
 
 typedef enum {
+  ELEV_NONE = 0,
   ELEV_DEEP_WATER,
   ELEV_WATER,
   ELEV_GROUND,
@@ -38,8 +61,18 @@ typedef struct {
   ItemType type;
   char name[32];
   int max_stack;
-  int weight;
+  char symbol;
+  short fg, bg;
 } ItemDef;
+
+typedef struct {
+  uint16_t id;
+  char name[32];
+  int max_health;
+  bool is_passable;
+  char symbol;
+  short fg, bg;
+} ObjectDef;
 
 typedef struct {
   const ItemDef *def;
@@ -72,16 +105,13 @@ typedef struct {
 } Entities;
 
 typedef struct {
-  int id;
-  int w, h;
-  size_t x, y;
+  uint16_t id;
   int health;
-  bool is_passable;
-} MapObject;
+} Object;
 
 typedef struct {
   Elevation elevation;
-  MapObject *object;
+  Object *object;
   Entity *entity;
 } MapCell;
 
@@ -97,19 +127,23 @@ typedef struct {
   Entities entities;
 } Game;
 
+extern const ItemDef ITEM_DB[];
+// extern const EntityDef ENT_DB[];
+extern const ObjectDef OBJ_DB[];
+
 const ItemDef *item_get_def(int id);
-char item_get_symbol(ItemDef item);
-int item_get_color_pair(ItemDef item);
+char item_get_symbol(int id);
 
 char entity_get_symbol(Entity entity);
-int entity_get_color_pair(Entity entity);
-void entity_move(Entity *e, int x, int y, Map *map);
+void entity_move(Entity *e, int dx, int dy, Map *map);
 
 Map *new_map(size_t height, size_t width);
 void free_map(Map *map);
 
 void free_game(Game *game);
 void game_init(Game *game);
+void game_generate_area(Game *game, size_t start_x, size_t start_y,
+                        size_t end_x, size_t end_y, uint32_t seed);
 void game_tick(Game *game);
 
 #endif
