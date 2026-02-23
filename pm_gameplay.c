@@ -4,19 +4,42 @@
 #include "models.h"
 #include "save.h"
 
+typedef struct {
+  char symbol;
+  short fg;
+  short bg;
+  int attr;
+
+  short cp; // Registered color pair at runtime
+} CellVisualDef;
+
+static CellVisualDef CELL_VISUAL_DB[] = {
+    [ELEV_NONE] = {'?', COLOR_BLACK, COLOR_MAGENTA, A_NORMAL},
+    [ELEV_DEEP_WATER] = {'~', COLOR_BLACK, COLOR_BLUE, A_NORMAL},
+    [ELEV_WATER] = {' ', COLOR_WHITE, COLOR_BLUE, A_NORMAL},
+    [ELEV_GROUND] = {' ', COLOR_BLACK, COLOR_GREEN, A_NORMAL},
+    [ELEV_HILL] = {'^', COLOR_BLACK, COLOR_WHITE, A_NORMAL},
+    [ELEV_MOUNTAIN] = {'^', COLOR_BLACK, COLOR_WHITE, A_BOLD},
+};
+
 WINDOW *g_win = NULL;
 Game current_game = {0};
 Save current_save = {0};
 
-bool gameplay_is_first_run = true;
-bool gameplay_need_redraw = true;
+bool g_is_first_run = true;
+bool g_need_redraw = true;
 
 void gameplay_init() {
   info("[model] model_gameplay initializing");
 
-  if (gameplay_is_first_run) {
+  if (g_is_first_run) {
     current_save.game = &current_game;
-    gameplay_is_first_run = false;
+    g_is_first_run = false;
+
+    for (int i = 0; i < _elevation_count; ++i) {
+      CELL_VISUAL_DB[i].cp =
+          fcp_get(CELL_VISUAL_DB[i].fg, CELL_VISUAL_DB[i].bg);
+    }
   }
 
   if (save_load(&current_save, current_slot) != SAVE_OK) {
@@ -35,16 +58,16 @@ void gameplay_input(int ch) {
 
   switch (ch) {
   case KEY_UP:
-    gameplay_need_redraw = entity_move(p, 0, -1, current_save.game->map);
+    g_need_redraw = entity_move(p, 0, -1, current_save.game->map);
     break;
   case KEY_DOWN:
-    gameplay_need_redraw = entity_move(p, 0, 1, current_save.game->map);
+    g_need_redraw = entity_move(p, 0, 1, current_save.game->map);
     break;
   case KEY_LEFT:
-    gameplay_need_redraw = entity_move(p, -1, 0, current_save.game->map);
+    g_need_redraw = entity_move(p, -1, 0, current_save.game->map);
     break;
   case KEY_RIGHT:
-    gameplay_need_redraw = entity_move(p, 1, 0, current_save.game->map);
+    g_need_redraw = entity_move(p, 1, 0, current_save.game->map);
     break;
   case 'q':
     next_state = STATE_MAIN_MENU;
@@ -56,8 +79,14 @@ void gameplay_render() {
   if (!g_win || !current_save.game || !current_save.game->player)
     return;
 
-  if (!gameplay_need_redraw)
+  if (!g_need_redraw)
     return;
+
+  static int redraw_count = 0;
+  static int fcp_get_calls = 0;
+  int fcp_get_calls_in_one_render = 0;
+  static int attrset_calls = 0;
+  int attrset_calls_in_one_render = 0;
 
   int sw, sh;
   getmaxyx(g_win, sh, sw);
@@ -97,31 +126,15 @@ void gameplay_render() {
       size_t wx = vx + x;
       MapCell *cell = &map->cells[wy][wx];
 
-      char symbol = '?';
-      short fg = COLOR_BLACK, bg = COLOR_MAGENTA;
-      int attr = A_NORMAL;
-
-      switch ((int)cell->elevation) {
-      case ELEV_GROUND:
-        symbol = ' ';
-        fg = COLOR_BLACK;
-        bg = COLOR_GREEN;
-        break;
-      case ELEV_WATER:
-        symbol = ' ';
-        bg = COLOR_BLUE;
-        break;
-      case ELEV_DEEP_WATER:
-        symbol = '~';
-        fg = COLOR_BLACK;
-        bg = COLOR_BLUE;
-        break;
-      }
+      const CellVisualDef *cell_def = &CELL_VISUAL_DB[cell->elevation];
+      char symbol = cell_def->symbol;
+      short fg = cell_def->fg, bg = cell_def->bg;
+      int attr = cell_def->attr;
+      short cp = cell_def->cp;
 
       if (cell->entity) {
         if (cell->entity->type == ENT_PLAYER) {
           symbol = '@';
-          fg = COLOR_BLUE;
           attr = A_BOLD;
         } else {
           // TODO: Should use ENT_DB, does not exist now
@@ -132,6 +145,10 @@ void gameplay_render() {
           if (def->bg != 0)
             bg = def->bg;
         }
+        cp = fcp_get(fg, bg);
+
+        ++fcp_get_calls;
+        ++fcp_get_calls_in_one_render;
       } else if (cell->object) {
         const ObjectDef *def = &OBJ_DB[cell->object->id];
         symbol = def->symbol;
@@ -139,14 +156,19 @@ void gameplay_render() {
           fg = def->fg;
         if (def->bg != 0)
           bg = def->bg;
+        cp = fcp_get(fg, bg);
+
+        ++fcp_get_calls;
+        ++fcp_get_calls_in_one_render;
       }
 
-      short cp = fcp_get(fg, bg);
       attr_t new_attrs = COLOR_PAIR(cp) | attr;
 
       if (new_attrs != current_attrs) {
         wattrset(g_win, new_attrs);
         current_attrs = new_attrs;
+        ++attrset_calls;
+        ++attrset_calls_in_one_render;
       }
 
       waddch(g_win, symbol);
@@ -155,17 +177,17 @@ void gameplay_render() {
 
   wattrset(g_win, A_NORMAL);
 
-  static int redraw_count = 0;
-
-  mvwprintw(g_win, 0, 0, "cell: { elevation: %d }", map->cells[p->y][p->x].elevation);
+  mvwprintw(g_win, 0, 0, "cell: { elevation: %d }",
+            map->cells[p->y][p->x].elevation);
   mvwprintw(g_win, 1, 0, "player: { x: %zu, y: %zu }", p->x, p->y);
-  mvwprintw(g_win, 2, 0, "entities: %zu",
-            current_save.game->entities.count);
-  mvwprintw(g_win, 3, 0, "redraw count: %d", ++redraw_count);
+  mvwprintw(g_win, 2, 0, "entities: %zu", current_save.game->entities.count);
+  mvwprintw(g_win, 3, 0, "redraws: %d", ++redraw_count);
+  mvwprintw(g_win, 4, 0, "fcp_get calls: %d / %d", fcp_get_calls_in_one_render, fcp_get_calls);
+  mvwprintw(g_win, 5, 0, "attrset calls: %d / %d", attrset_calls_in_one_render, attrset_calls);
 
   wrefresh(g_win);
 
-  gameplay_need_redraw = false;
+  g_need_redraw = false;
 }
 
 void gameplay_resize() {

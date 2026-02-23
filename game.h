@@ -18,7 +18,8 @@ typedef enum {
   ELEV_WATER,
   ELEV_GROUND,
   ELEV_HILL,
-  ELEV_MOUNTAIN
+  ELEV_MOUNTAIN,
+  _elevation_count,
 } Elevation;
 
 typedef enum {
