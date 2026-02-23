@@ -11,27 +11,6 @@
 // 3. object
 // 4. map
 // 5. game
-//
-// Game game = {
-//   Entity *player
-//   Entities entities
-//
-//   Map map = {
-//     w, h
-//     [][]MapCell cells = [][]{
-//       Elevation elevation
-//       MapObject object = {
-//         id - the id in ObjectDef
-//         x, y
-//         health
-//       }
-//       Entity entity = {
-//         x, y
-//         name
-//       }
-//     }
-//   }
-// }
 
 typedef enum {
   ELEV_NONE = 0,

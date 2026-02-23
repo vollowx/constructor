@@ -117,12 +117,13 @@ void gameplay_render() {
 
       MapCell *cell = &map->cells[wy][wx];
 
-      short fg = COLOR_WHITE, bg = COLOR_BLACK;
-      char symbol = ' ';
+      char symbol = '?';
+      short fg = COLOR_BLACK, bg = COLOR_MAGENTA;
+      int attr = A_NORMAL;
 
       switch ((int)cell->elevation) {
       case ELEV_GROUND:
-        symbol = '%';
+        symbol = ' ';
         fg = COLOR_BLACK;
         bg = COLOR_GREEN;
         break;
@@ -138,8 +139,19 @@ void gameplay_render() {
       }
 
       if (cell->entity) {
-        render_entity(g_win, cell->entity, y, x);
-        continue;
+        if (cell->entity->type == ENT_PLAYER) {
+          symbol = '@';
+          fg = COLOR_BLUE;
+          attr = A_BOLD;
+        } else {
+          // TODO: Should use ENT_DB, does not exist now
+          const ItemDef *def = &ITEM_DB[cell->entity->id];
+          symbol = def->symbol;
+          if (def->fg != 0)
+            fg = def->fg;
+          if (def->bg != 0)
+            bg = def->bg;
+        }
       } else if (cell->object) {
         const ObjectDef *def = &OBJ_DB[cell->object->id];
         symbol = def->symbol;
@@ -150,16 +162,16 @@ void gameplay_render() {
       }
 
       short cp = fcp_get(fg, bg);
-      wattron(g_win, COLOR_PAIR(cp));
+      wattron(g_win, COLOR_PAIR(cp) | attr);
       mvwaddch(g_win, y, x, symbol);
-      wattroff(g_win, COLOR_PAIR(cp));
+      wattroff(g_win, COLOR_PAIR(cp) | attr);
     }
   }
 
-  // Tiny HUD to show movement
   mvwprintw(g_win, 0, 0, "[ %zu, %zu ]", p->x, p->y);
   mvwprintw(g_win, 1, 0, "Entities in memory: %zu",
             current_save.game->entities.count);
+  mvwprintw(g_win, 2, 0, "%d", map->cells[p->y][p->x].elevation);
   wrefresh(g_win);
 }
 

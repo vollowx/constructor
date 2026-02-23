@@ -1,13 +1,18 @@
 CC=gcc
-CFLAGS=-Wall -Wextra
+CFLAGS=-Wall -Wextra -Ithirdparty
 LIBS=-lncurses -lmenu
 
-SRC=main.c fcp.c game.c log.c models.c options.c save.c am_log.c pm_main_menu.c pm_saves.c pm_gameplay.c pm_options.c
+TARGET=constructor
 
-all: build
+SRC=main.c fcp.c game.c log.c models.c options.c save.c \
+    am_log.c \
+    pm_main_menu.c pm_saves.c pm_gameplay.c pm_options.c \
+    thirdparty/simplexnoise1234.c
 
-build: $(SRC)
-	$(CC) $(CFLAGS) $(SRC) -o constructor $(LIBS)
+all: $(TARGET)
+
+$(TARGET): $(SRC)
+	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) $(LIBS)
 
 clean:
-	rm -f constructor
+	rm -f $(TARGET)

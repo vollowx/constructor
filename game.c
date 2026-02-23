@@ -1,6 +1,7 @@
 #include <time.h>
 
 #include <ncurses.h>
+#include <simplexnoise1234.h>
 
 #include "game.h"
 #include "helpers.h"
