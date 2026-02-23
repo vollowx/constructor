@@ -18,8 +18,8 @@ static CellVisualDef CELL_VISUAL_DB[] = {
     [ELEV_DEEP_WATER] = {'~', COLOR_BLACK, COLOR_BLUE, A_NORMAL},
     [ELEV_WATER] = {' ', COLOR_WHITE, COLOR_BLUE, A_NORMAL},
     [ELEV_GROUND] = {' ', COLOR_BLACK, COLOR_GREEN, A_NORMAL},
-    [ELEV_HILL] = {'^', COLOR_BLACK, COLOR_WHITE, A_NORMAL},
-    [ELEV_MOUNTAIN] = {'^', COLOR_BLACK, COLOR_WHITE, A_BOLD},
+    [ELEV_HILL] = {'^', COLOR_BLACK, COLOR_GREEN, A_BOLD},
+    [ELEV_MOUNTAIN] = {'^', COLOR_BLACK, COLOR_GREEN, A_NORMAL},
 };
 
 WINDOW *g_win = NULL;
@@ -135,6 +135,9 @@ void gameplay_render() {
       if (cell->entity) {
         if (cell->entity->type == ENT_PLAYER) {
           symbol = '@';
+          fg += bg;
+          bg = fg - bg;
+          fg -= bg;
           attr = A_BOLD;
         } else {
           // TODO: Should use ENT_DB, does not exist now

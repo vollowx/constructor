@@ -192,87 +192,57 @@ void free_game(Game *game) {
   game->player = NULL;
 }
 
-float noise2d(int x, int y, uint32_t seed) {
-  int n = x + y * 57 + seed;
-  n = (n << 13) ^ n;
-  // Standard deterministic hash to get a float between 0 and 1
-  float res =
-      (1.0 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) /
-                 1073741824.0);
-  return (res + 1.0f) / 2.0f;
-}
-
-// Linearly interpolate between a and b
-float lerp(float a, float b, float t) { return a + t * (b - a); }
-
-// Smoothly interpolate for a more organic feel
-float smooth_noise(float x, float y, uint32_t seed) {
-  int i = (int)x;
-  int j = (int)y;
-  float fx = x - i;
-  float fy = y - j;
-
-  // Corner values
-  float a = noise2d(i, j, seed);
-
-  float b = noise2d(i + 1, j, seed);
-  float c = noise2d(i, j + 1, seed);
-
-  float d = noise2d(i + 1, j + 1, seed);
-
-  // Bi-linear interpolation
-  float ux = fx * fx * (3 - 2 * fx);
-  float uy = fy * fy * (3 - 2 * fy);
-
-  return lerp(a, b, ux) + (c - a) * uy * (1 - ux) + (d - b) * ux * uy;
-}
-
 void game_gen_area(Game *game, size_t start_y, size_t start_x, size_t end_y,
                    size_t end_x) {
   if (!game || !game->map)
     return;
   Map *map = game->map;
 
+  float seed_ox = (float)(game->seed % 100000);
+  float seed_oy = (float)((game->seed / 100) % 100000);
+
   for (size_t y = start_y; y < end_y && y < map->h; y++) {
     for (size_t x = start_x; x < end_x && x < map->w; x++) {
       MapCell *cell = &map->cells[y][x];
 
-      // Only generate if untouched
-
       if (cell->elevation == ELEV_NONE) {
-        // Scale controls island size: higher = smaller, more frequent islands
-        float scale = 0.15f;
-        float val =
-            smooth_noise((float)x * scale, (float)y * scale, game->seed);
+        float scale = 0.07f;
+        float raw_noise =
+            snoise2((float)x * scale + seed_ox, (float)y * scale + seed_oy);
+        float val = (raw_noise + 1.0f) * 0.5f;
 
-        // Thresholds for Forager-style layers
-        if (val > 0.55f) {
-
+        if (val > 0.9f) {
+          cell->elevation = ELEV_MOUNTAIN;
+        } else if (val > 0.85f) {
+          cell->elevation = ELEV_HILL;
+        } else if (val > 0.4f) {
           cell->elevation = ELEV_GROUND;
-        } else if (val > 0.45f) {
+        } else if (val > 0.3f) {
           cell->elevation = ELEV_WATER;
         } else {
           cell->elevation = ELEV_DEEP_WATER;
         }
 
-        // RESOURCE PASS: Only on new ground
-        if (cell->elevation == ELEV_GROUND) {
-          // Use a different seed offset for resources so they don't follow the
-          // coastline perfectly
+        if (cell->elevation == ELEV_GROUND || cell->elevation == ELEV_HILL) {
           uint32_t res_h = game->seed ^ ((uint32_t)x * 123456789U) ^
                            ((uint32_t)y * 987654321U);
-          if ((res_h % 100) < 5) {
+
+          uint32_t spawn_threshold = (cell->elevation == ELEV_HILL) ? 7U : 4U;
+
+          if ((res_h % 100) < spawn_threshold) {
             Entity *res = calloc(1, sizeof(Entity));
-            res->type = ENT_MOB;
-            res->x = x;
-            res->y = y;
-            int pick = (res_h >> 8) % 3;
-            res->id = ITEM_DB[pick].id;
+            if (res) {
+              res->type = ENT_MOB;
+              res->x = x;
+              res->y = y;
 
-            strncpy(res->name, ITEM_DB[pick].name, 31);
+              int pick = (res_h >> 8) % 3;
+              res->id = ITEM_DB[pick].id;
+              strncpy(res->name, ITEM_DB[pick].name, sizeof(res->name) - 1);
 
-            cell->entity = res;
-            da_append(&game->entities, res);
+              cell->entity = res;
+              da_append(&game->entities, res);
+            }
           }
         }
       }
