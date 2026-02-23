@@ -115,7 +115,7 @@ const ItemDef *item_get_def(int id);
 char item_get_symbol(int id);
 
 char entity_get_symbol(Entity entity);
-void entity_move(Entity *e, int dx, int dy, Map *map);
+bool entity_move(Entity *e, int dx, int dy, Map *map);
 
 Map *new_map(size_t height, size_t width);
 void free_map(Map *map);

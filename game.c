@@ -40,27 +40,27 @@ char item_get_symbol(int id) {
   return def ? def->symbol : '?';
 }
 
-void entity_move(Entity *e, int dx, int dy, Map *map) {
+bool entity_move(Entity *e, int dx, int dy, Map *map) {
   if (!e || !map)
-    return;
+    return false;
 
   if (dx < 0 && e->x < (size_t)abs(dx))
-    return;
+    return false;
   if (dy < 0 && e->y < (size_t)abs(dy))
-    return;
+    return false;
 
   size_t new_x = e->x + dx;
   size_t new_y = e->y + dy;
 
   if (new_x >= map->w || new_y >= map->h)
-    return;
+    return false;
 
   MapCell *target = &map->cells[new_y][new_x];
 
   if (target->entity != NULL)
-    return;
+    return false;
   if (target->elevation == ELEV_DEEP_WATER || target->elevation == ELEV_WATER)
-    return;
+    return false;
 
   map->cells[e->y][e->x].entity = NULL;
 
@@ -69,6 +69,8 @@ void entity_move(Entity *e, int dx, int dy, Map *map) {
   e->z = target->elevation;
 
   target->entity = e;
+
+  return true;
 }
 
 Map *new_map(size_t height, size_t width) {
