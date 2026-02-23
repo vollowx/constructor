@@ -41,8 +41,6 @@ void main_menu_init() {
 }
 
 void main_menu_input(int ch) {
-  static int counter = 0;
-
   switch (ch) {
   case KEY_DOWN:
     menu_driver(m_menu, REQ_DOWN_ITEM);
@@ -50,8 +48,8 @@ void main_menu_input(int ch) {
   case KEY_UP:
     menu_driver(m_menu, REQ_UP_ITEM);
     break;
-  case 't':
-    warn("test log no. %d", counter++);
+  case 'q':
+    next_state = STATE_QUIT;
     break;
   case 10: {
     int index = item_index(current_item(m_menu));

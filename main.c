@@ -75,7 +75,9 @@ int main() {
 
           refresh();
         } else {
-          pm->input(ch);
+          static int counter = 0;
+          if (ch == 't') warn("test log no. %d", counter++);
+	  else           pm->input(ch);
         }
       }
 
