@@ -119,7 +119,7 @@ void free_map(Map *map) {
   free(map);
 }
 
-// TODO: Chunk game both in struct and file
+// TASK(20260223-173936): Chunk-ize game both in struct and file
 void game_init(Game *game) {
   game->map = new_map(2048, 2048);
 

@@ -140,7 +140,7 @@ void gameplay_render() {
           fg -= bg;
           attr = A_BOLD;
         } else {
-          // TODO: Should use ENT_DB, does not exist now
+          // TASK(20260223-165748): Should use ENT_DB, does not exist now
           const ItemDef *def = &ITEM_DB[cell->entity->id];
           symbol = def->symbol;
           if (def->fg != 0)
