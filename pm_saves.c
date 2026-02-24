@@ -50,6 +50,7 @@ void rebuild_saves_menu() {
   set_menu_win(s_menu, s_win);
   set_menu_sub(s_menu, derwin(s_win, SAVES_HEIGHT - 4, SAVES_WIDTH - 4, 2, 1));
   set_menu_mark(s_menu, " > ");
+  set_current_item(s_menu, s_items[current_slot]);
 
   post_menu(s_menu);
 }
@@ -73,6 +74,11 @@ void saves_init() {
 void saves_input(int ch) {
   int slot = item_index(current_item(s_menu));
 
+  ITEM *cur = current_item(s_menu);
+  if (cur) {
+    current_slot = item_index(cur);
+  }
+
   switch (ch) {
   case KEY_DOWN:
   case 'j':
@@ -88,7 +94,6 @@ void saves_input(int ch) {
 
   case 10:
     if (previews[slot].exists) {
-      current_slot = slot;
       next_state = STATE_GAMEPLAY;
     } else {
       Game game = {0};
@@ -106,7 +111,6 @@ void saves_input(int ch) {
     break;
 
   case 'x':
-    // current_slot = idx
     // next_state = STATE_SAVE_DELETE
     break;
   case 'r':

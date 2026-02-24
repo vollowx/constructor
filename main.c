@@ -3,7 +3,7 @@
 #include "models.h"
 #include "options.h"
 
-int current_slot = -1;
+int current_slot = 0;
 GameState next_state = STATE_MAIN_MENU;
 GameState current_state = (GameState)-1;
 // Current primary model
