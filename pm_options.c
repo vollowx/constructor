@@ -104,9 +104,11 @@ void options_init() {
 void options_input(int ch) {
   switch (ch) {
   case KEY_DOWN:
+  case 'j':
     menu_driver(o_menu, REQ_DOWN_ITEM);
     break;
   case KEY_UP:
+  case 'k':
     menu_driver(o_menu, REQ_UP_ITEM);
     break;
   case 'q':

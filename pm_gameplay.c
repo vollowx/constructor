@@ -70,7 +70,7 @@ void gameplay_input(int ch) {
     g_need_redraw = entity_move(p, 1, 0, current_save.game->map);
     break;
   case 'q':
-    next_state = STATE_MAIN_MENU;
+    next_state = STATE_SAVES;
     break;
   }
 }

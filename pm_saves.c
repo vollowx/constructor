@@ -75,12 +75,13 @@ void saves_input(int ch) {
 
   switch (ch) {
   case KEY_DOWN:
+  case 'j':
     menu_driver(s_menu, REQ_DOWN_ITEM);
     break;
   case KEY_UP:
+  case 'k':
     menu_driver(s_menu, REQ_UP_ITEM);
     break;
-
   case 'q':
     next_state = STATE_MAIN_MENU;
     break;
