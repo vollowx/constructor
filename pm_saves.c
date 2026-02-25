@@ -155,7 +155,7 @@ void saves_render() {
 
   box(s_win, 0, 0);
   mvwprintw(s_win, 0, 3, " Select Save ");
-  wrefresh(s_win);
+  wnoutrefresh(s_win);
 
   werase(s_pre);
   box(s_pre, 0, 0);
@@ -180,7 +180,7 @@ void saves_render() {
     mvwprintw(s_pre, 3, 4, "No data available.");
     wattroff(s_pre, A_DIM);
   }
-  wrefresh(s_pre);
+  wnoutrefresh(s_pre);
 }
 
 void saves_resize() {
@@ -198,6 +198,11 @@ void saves_resize() {
 }
 
 void saves_cleanup() {
+  werase(s_win);
+  werase(s_pre);
+  wnoutrefresh(s_win);
+  wnoutrefresh(s_pre);
+
   free_menu_ctx(s_win, s_menu, s_items, 3, true);
 
   if (s_pre) {

@@ -33,11 +33,7 @@ void main_menu_init() {
   set_menu_sub(m_menu,
                derwin(m_win, MAIN_MENU_HEIGHT - 4, MAIN_MENU_WIDTH - 4, 2, 1));
   set_menu_mark(m_menu, " > ");
-  box(m_win, 0, 0);
-  mvwprintw(m_win, 0, 3, " Constructor ");
   post_menu(m_menu);
-
-  refresh();
 }
 
 void main_menu_input(int ch) {
@@ -74,12 +70,18 @@ void main_menu_input(int ch) {
   }
 }
 
-void main_menu_render() { wrefresh(m_win); }
+void main_menu_render() {
+  box(m_win, 0, 0);
+  mvwprintw(m_win, 0, 3, " Constructor ");
+  wnoutrefresh(m_win);
+}
 
 void main_menu_resize() {
   mvwin(m_win, (LINES - MAIN_MENU_HEIGHT) / 2, (COLS - MAIN_MENU_WIDTH) / 2);
 }
 
 void main_menu_cleanup() {
+  werase(m_win);
+  wnoutrefresh(m_win);
   free_menu_ctx(m_win, m_menu, m_items, MAIN_MENU_N_ITEMS, false);
 }

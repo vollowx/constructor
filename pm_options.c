@@ -123,10 +123,8 @@ void options_input(int ch) {
       current_options.log_level = (current_options.log_level + 1) % 3;
       rebuild_options_menu();
     } else if (strstr(name, "Show log window")) {
-      erase();
       current_options.show_log = !current_options.show_log;
       rebuild_options_menu();
-      refresh();
     } else if (strcmp(name, "Save") == 0) {
       options_save();
       next_state = STATE_MAIN_MENU;
@@ -142,7 +140,7 @@ void options_input(int ch) {
 void options_render() {
   box(o_win, 0, 0);
   mvwprintw(o_win, 0, 3, " Options ");
-  wrefresh(o_win);
+  wnoutrefresh(o_win);
 }
 
 void options_resize() {
@@ -151,5 +149,7 @@ void options_resize() {
 }
 
 void options_cleanup() {
+  werase(o_win);
+  wnoutrefresh(o_win);
   free_menu_ctx(o_win, o_menu, o_items, OPTIONS_HEIGHT - 4, false);
 }

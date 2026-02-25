@@ -188,7 +188,7 @@ void gameplay_render() {
   mvwprintw(g_win, 4, 0, "fcp_get calls: %d / %d", fcp_get_calls_in_one_render, fcp_get_calls);
   mvwprintw(g_win, 5, 0, "attrset calls: %d / %d", attrset_calls_in_one_render, attrset_calls);
 
-  wrefresh(g_win);
+  wnoutrefresh(g_win);
 
   g_need_redraw = false;
 }
@@ -201,6 +201,8 @@ void gameplay_resize() {
 }
 
 void gameplay_cleanup() {
+  werase(g_win);
+  wnoutrefresh(g_win);
   if (g_win) {
     delwin(g_win);
     g_win = NULL;

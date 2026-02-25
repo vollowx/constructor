@@ -25,8 +25,21 @@ void log_input(int ch) {
 }
 
 void log_render() {
-  if (!l_win || !current_options.show_log)
+  if (!l_win)
     return;
+
+  static bool was_showing = false;
+
+  if (!current_options.show_log) {
+    if (was_showing) {
+      werase(l_win);
+      wnoutrefresh(l_win);
+      was_showing = false;
+    }
+    return;
+  }
+
+  was_showing = true;
 
   werase(l_win);
   mvwhline(l_win, 0, 0, ACS_HLINE, COLS);
@@ -45,7 +58,7 @@ void log_render() {
     }
   }
 
-  wrefresh(l_win);
+  wnoutrefresh(l_win);
 }
 
 void log_resize() {
@@ -58,6 +71,8 @@ void log_resize() {
 }
 
 void log_cleanup() {
+  werase(l_win);
+  wnoutrefresh(l_win);
   if (l_win) {
     delwin(l_win);
   }

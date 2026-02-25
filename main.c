@@ -45,7 +45,6 @@ int main() {
   while (next_state != STATE_QUIT) {
     if (next_state != current_state) {
       if (pm) {
-        erase();
         pm->cleanup();
       }
 
@@ -76,15 +75,21 @@ int main() {
           refresh();
         } else {
           static int counter = 0;
-          if (ch == 't') warn("test log no. %d", counter++);
-	  else           pm->input(ch);
+          if (ch == 't')
+            warn("test log no. %d", counter++);
+          else
+            pm->input(ch);
         }
       }
 
       pm->render();
     }
 
-    log_render();
+#define X(name) name##_render();
+    AM_MAP(X)
+#undef X
+
+    doupdate();
   }
 
 #define X(name) name##_cleanup();
