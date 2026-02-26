@@ -7,23 +7,32 @@
 #include "helpers.h"
 
 // clang-format off
-const ItemDef ITEM_DB[] = {
-    {.id = 0,     .type = ITEM_RESOURCE,   .name = "Copper Ore", .symbol = 'c', .fg = COLOR_YELLOW,  .max_stack = 64},
-    {.id = 1,     .type = ITEM_RESOURCE,   .name = "Iron Ore",   .symbol = 'o', .fg = COLOR_WHITE,   .max_stack = 64},
-    {.id = 2,     .type = ITEM_RESOURCE,   .name = "Gold Ore",   .symbol = 'o', .fg = COLOR_YELLOW,  .max_stack = 64},
-    {.id = 10000, .type = ITEM_PLACEABLE,  .name = "Brick",      .symbol = 'N', .fg = COLOR_WHITE,   .max_stack = 64},
-    {.id = 20000, .type = ITEM_CONSUMABLE, .name = "Apple",      .symbol = 'O', .fg = COLOR_RED,     .max_stack = 24},
-    {.id = 20001, .type = ITEM_CONSUMABLE, .name = "Orange",     .symbol = 'O', .fg = COLOR_YELLOW,  .max_stack = 24},
-    {.id = 20002, .type = ITEM_CONSUMABLE, .name = "Berry",      .symbol = 'o', .fg = COLOR_YELLOW,  .max_stack = 24},
-    {.id = 30000, .type = ITEM_EQUIPMENT,  .name = "Copper Axe", .symbol = 'F', .fg = COLOR_YELLOW},
-    {.id = 30001, .type = ITEM_EQUIPMENT,  .name = "Iron Axe",   .symbol = 'F', .fg = COLOR_WHITE },
-    {.id = 30002, .type = ITEM_EQUIPMENT,  .name = "Gold Axe",   .symbol = 'F', .fg = COLOR_YELLOW},
+ItemDef ITEM_DB[] = {
+    {.id = 0,     .type = ITEM_RESOURCE,   .name = "Copper Ore", .symbol = {'c', 'O'},   .fg = COLOR_YELLOW, .bg = -1,          .max_stack = 64},
+    {.id = 1,     .type = ITEM_RESOURCE,   .name = "Iron Ore",   .symbol = {'o', 'O'},   .fg = COLOR_WHITE,  .bg = -1,          .max_stack = 64},
+    {.id = 2,     .type = ITEM_RESOURCE,   .name = "Gold Ore",   .symbol = {'o', 'O'},   .fg = COLOR_YELLOW, .bg = -1,          .max_stack = 64},
+    {.id = 10000, .type = ITEM_PLACEABLE,  .name = "Brick",      .symbol = {'#', '#'},   .fg = COLOR_WHITE,  .bg = COLOR_RED,   .max_stack = 64},
+    {.id = 20000, .type = ITEM_CONSUMABLE, .name = "Apple",      .symbol = {'a', 'O'},   .fg = COLOR_RED,    .bg = -1,          .max_stack = 24},
+    {.id = 20001, .type = ITEM_CONSUMABLE, .name = "Orange",     .symbol = {'(', ')'},   .fg = COLOR_YELLOW, .bg = -1,          .max_stack = 24},
+    {.id = 20002, .type = ITEM_CONSUMABLE, .name = "Berry",      .symbol = {'\\', 'o'},  .fg = COLOR_YELLOW, .bg = -1,          .max_stack = 24},
+    {.id = 30000, .type = ITEM_EQUIPMENT,  .name = "Copper Axe", .symbol = {'A', '\\'},  .fg = COLOR_YELLOW, .bg = -1},
+    {.id = 30001, .type = ITEM_EQUIPMENT,  .name = "Iron Axe",   .symbol = {'A', '\\'},  .fg = COLOR_WHITE,  .bg = -1},
+    {.id = 30002, .type = ITEM_EQUIPMENT,  .name = "Gold Axe",   .symbol = {'A', '\\'},  .fg = COLOR_YELLOW, .bg = -1},
 };
 
-const ObjectDef OBJ_DB[] = {
-    {.id = 0, .name = "Stone Boulder", .max_health = 5,  .is_passable = false, .symbol = 'O', .fg = COLOR_BLACK, .bg = COLOR_WHITE },
-    {.id = 1, .name = "Wood Bridge",   .max_health = 1,  .is_passable = true , .symbol = '#', .fg = COLOR_BLACK, .bg = COLOR_YELLOW},
-    {.id = 2, .name = "Furnace",       .max_health = 10, .is_passable = false, .symbol = '&', .fg = COLOR_BLACK, .bg = COLOR_WHITE },
+EntityDef ENTITY_DB[] = {
+    {.id = 0,     .type = ENTITY_PLAYER,   .name = "You!",          .max_health = 100, .is_passable = false, .symbol = {'\\', '@'}, .fg = COLOR_RED,   .bg = -1, .attr = A_BOLD},
+    {.id = 1,     .type = ENTITY_ANIMAL,   .name = "Cow",           .max_health = 20,  .is_passable = false, .symbol = {'U', 'o'},  .fg = COLOR_BLACK, .bg = -1},
+    {.id = 2,     .type = ENTITY_ANIMAL,   .name = "Pig",           .max_health = 20,  .is_passable = false, .symbol = {'q', 'p'},  .fg = COLOR_RED,   .bg = -1},
+    {.id = 3,     .type = ENTITY_ANIMAL,   .name = "Sheep",         .max_health = 20,  .is_passable = false, .symbol = {'w', 'm'},  .fg = COLOR_WHITE, .bg = -1},
+};
+
+ObjectDef OBJECT_DB[] = {
+    // In this case 0 is the default object_id for cells
+    {.id = 1,     .name = "Wood Bridge",   .max_health = 1,  .is_passable = true , .symbol = {'#', '#'}, .fg = COLOR_BLACK, .bg = COLOR_YELLOW},
+    {.id = 2,     .name = "Stone Boulder", .max_health = 5,  .is_passable = false, .symbol = {'O', 'O'}, .fg = COLOR_BLACK, .bg = COLOR_WHITE},
+    {.id = 3,     .name = "Furnace",       .max_health = 10, .is_passable = false, .symbol = {'&', '&'}, .fg = COLOR_BLACK, .bg = COLOR_WHITE},
+    {.id = 10000, .name = "Brick",         .max_health = 15, .is_passable = false, .symbol = {'#', '#'}, .fg = COLOR_BLACK, .bg = COLOR_RED},
 };
 // clang-format on
 
@@ -35,9 +44,21 @@ const ItemDef *item_get_def(int id) {
   return NULL;
 }
 
-char item_get_symbol(int id) {
-  const ItemDef *def = item_get_def(id);
-  return def ? def->symbol : '?';
+const EntityDef *entity_get_def(int id) {
+  for (size_t i = 0; i < sizeof(ENTITY_DB) / sizeof(EntityDef); ++i) {
+    if (ENTITY_DB[i].id == id)
+      return &ENTITY_DB[i];
+  }
+  return NULL;
+}
+
+// TODO: Remove as an unused function
+const ObjectDef *object_get_def(int id) {
+  for (size_t i = 0; i < sizeof(OBJECT_DB) / sizeof(ObjectDef); ++i) {
+    if (OBJECT_DB[i].id == id)
+      return &OBJECT_DB[i];
+  }
+  return NULL;
 }
 
 bool entity_move(Entity *e, int dx, int dy, Map *map) {
@@ -57,6 +78,8 @@ bool entity_move(Entity *e, int dx, int dy, Map *map) {
 
   MapCell *target = &map->cells[new_y][new_x];
 
+  if (target->object_id)
+    return false;
   if (target->entity != NULL)
     return false;
   if (target->elevation == ELEV_DEEP_WATER || target->elevation == ELEV_WATER)
@@ -66,7 +89,6 @@ bool entity_move(Entity *e, int dx, int dy, Map *map) {
 
   e->x = new_x;
   e->y = new_y;
-  e->z = target->elevation;
 
   target->entity = e;
 
@@ -130,12 +152,9 @@ void game_init(Game *game) {
   Entity *player = malloc(sizeof(Entity));
   memset(player, 0, sizeof(Entity));
 
-  player->id = 0;
-  player->type = ENT_PLAYER;
+  player->def = &ENTITY_DB[0];
   player->health = 100;
-  player->health_max = 100;
-  player->z = ELEV_GROUND;
-  strncpy(player->name, "Default Name", sizeof(player->name) - 1);
+  strncpy(player->name, "Guy", sizeof(player->name) - 1);
 
   player->inventory.count = 0;
   player->inventory.capacity = 8;
@@ -232,13 +251,12 @@ void game_gen_area(Game *game, size_t start_y, size_t start_x, size_t end_y,
           if ((res_h % 100) < spawn_threshold) {
             Entity *res = calloc(1, sizeof(Entity));
             if (res) {
-              res->type = ENT_MOB;
               res->x = x;
               res->y = y;
 
-              int pick = (res_h >> 8) % 3;
-              res->id = ITEM_DB[pick].id;
-              strncpy(res->name, ITEM_DB[pick].name, sizeof(res->name) - 1);
+              int pick = (res_h >> 8) % 3 + 2;
+              res->def = &ENTITY_DB[pick];
+              strncpy(res->name, ENTITY_DB[pick].name, sizeof(res->name) - 1);
 
               cell->entity = res;
               da_append(&game->entities, res);

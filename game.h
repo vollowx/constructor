@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include <ncurses.h>
+
 // Order:
 // 1. item
 // 2. entity
@@ -30,10 +32,11 @@ typedef enum {
 } ItemType;
 
 typedef enum {
-  ENT_PLAYER,
-  ENT_NPC,
-  ENT_MOB,
-  ENT_ITEM_DROP,
+  ENTITY_PLAYER,
+  ENTITY_NPC,
+  ENTITY_ENEMY,
+  ENTITY_ANIMAL,
+  ENTITY_ITEM,
 } EntityType;
 
 typedef struct {
@@ -41,17 +44,33 @@ typedef struct {
   ItemType type;
   char name[32];
   int max_stack;
-  char symbol;
+
+  char symbol[2];
   short fg, bg;
+  attr_t attr;
 } ItemDef;
+
+typedef struct {
+  uint16_t id;
+  EntityType type;
+  char name[32];
+  int max_health;
+  bool is_passable;
+
+  char symbol[2];
+  short fg, bg;
+  attr_t attr;
+} EntityDef;
 
 typedef struct {
   uint16_t id;
   char name[32];
   int max_health;
   bool is_passable;
-  char symbol;
+
+  char symbol[2];
   short fg, bg;
+  attr_t attr;
 } ObjectDef;
 
 typedef struct {
@@ -67,13 +86,10 @@ typedef struct {
 } ItemStacks;
 
 typedef struct {
-  int id;
-  EntityType type;
+  const EntityDef *def;
   char name[32];
   int health;
-  int health_max;
   size_t x, y;
-  Elevation z;
 
   ItemStacks inventory;
 } Entity;
@@ -85,13 +101,9 @@ typedef struct {
 } Entities;
 
 typedef struct {
-  uint16_t id;
-  int health;
-} Object;
-
-typedef struct {
   Elevation elevation;
-  Object *object;
+  uint16_t object_id;
+  int object_health;
   Entity *entity;
 } MapCell;
 
@@ -108,14 +120,10 @@ typedef struct {
   Entities entities;
 } Game;
 
-extern const ItemDef ITEM_DB[];
-// extern const EntityDef ENT_DB[];
-extern const ObjectDef OBJ_DB[];
-
 const ItemDef *item_get_def(int id);
-char item_get_symbol(int id);
+const EntityDef *entity_get_def(int id);
+const ObjectDef *object_get_def(int id);
 
-char entity_get_symbol(Entity entity);
 bool entity_move(Entity *e, int dx, int dy, Map *map);
 
 Map *new_map(size_t height, size_t width);

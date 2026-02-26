@@ -9,9 +9,6 @@
 #include "log.h"
 #include "save.h"
 
-#define SAVE_MAGIC 0x47414D45 // "GAME"
-#define SAVE_VERSION 1
-
 static void get_path(int slot, char *buf, size_t len) {
   snprintf(buf, len, "save%d.dat", slot);
 }
@@ -34,12 +31,14 @@ static SaveResult map_load(Map **map_ptr, FILE *fp) {
 
   for (size_t y = 0; y < h; ++y) {
     for (size_t x = 0; x < w; ++x) {
-      if (fread(&map->cells[y][x].elevation, sizeof(Elevation), 1, fp) != 1) {
+      MapCell *cell = &map->cells[y][x];
+
+      if (fread(&cell->elevation, sizeof(Elevation), 1, fp) != 1)
         return SAVE_ERR_READ;
-      }
-      // Pointers safely zeroed inside new_map, but explicit is good:
-      map->cells[y][x].entity = NULL;
-      map->cells[y][x].object = NULL;
+      if (fread(&cell->object_id, sizeof(uint16_t), 1, fp) != 1)
+        return SAVE_ERR_READ;
+      if (fread(&cell->object_health, sizeof(int), 1, fp) != 1)
+        return SAVE_ERR_READ;
     }
   }
   return SAVE_OK;
@@ -78,14 +77,14 @@ SaveResult save_load(Save *self, int slot) {
   info("[save] Header valid with player: %s", self->header.player_name);
 
   if (map_load(&self->game->map, fp) != SAVE_OK) {
-    error("[save] Failed loading map");
+    error("[save] Failed to load map");
     fclose(fp);
     return SAVE_ERR_READ;
   }
 
-  uint64_t entity_count;
+  size_t entity_count;
 
-  if (fread(&entity_count, sizeof(uint64_t), 1, fp) != 1) {
+  if (fread(&entity_count, sizeof(size_t), 1, fp) != 1) {
     fclose(fp);
     return SAVE_ERR_READ;
   }
@@ -94,13 +93,47 @@ SaveResult save_load(Save *self, int slot) {
 
   // NOTE: You must ensure self->game->entities is freed/cleared before this
   // point if you are loading a game while already playing!
-  da_reserve(&self->game->entities, (size_t)entity_count);
+  da_reserve(&self->game->entities, entity_count);
   self->game->player = NULL;
 
   for (size_t i = 0; i < entity_count; ++i) {
     Entity *ent = malloc(sizeof(Entity));
-    if (fread(ent, sizeof(Entity), 1, fp) != 1) {
-      error("[save] Failed to load entity %zu", i);
+    uint16_t def_id;
+
+    if (fread(&def_id, sizeof(uint16_t), 1, fp) != 1) {
+      free(ent);
+      fclose(fp);
+      return SAVE_ERR_READ;
+    }
+    ent->def = entity_get_def(def_id);
+
+    if (fread(ent->name, sizeof(char), 32, fp) != 32) {
+      free(ent);
+      fclose(fp);
+      return SAVE_ERR_READ;
+    }
+    if (fread(&ent->health, sizeof(int), 1, fp) != 1) {
+      free(ent);
+      fclose(fp);
+      return SAVE_ERR_READ;
+    }
+    if (fread(&ent->x, sizeof(size_t), 1, fp) != 1) {
+      free(ent);
+      fclose(fp);
+      return SAVE_ERR_READ;
+    }
+    if (fread(&ent->y, sizeof(size_t), 1, fp) != 1) {
+      free(ent);
+      fclose(fp);
+      return SAVE_ERR_READ;
+    }
+
+    if (fread(&ent->inventory.capacity, sizeof(int), 1, fp) != 1) {
+      free(ent);
+      fclose(fp);
+      return SAVE_ERR_READ;
+    }
+    if (fread(&ent->inventory.count, sizeof(int), 1, fp) != 1) {
       free(ent);
       fclose(fp);
       return SAVE_ERR_READ;
@@ -124,10 +157,8 @@ SaveResult save_load(Save *self, int slot) {
         }
         ent->inventory.items[j].def = item_get_def(def_id);
       }
-
     } else {
       ent->inventory.items = NULL;
-      ent->inventory.capacity = 0;
     }
 
     da_append(&self->game->entities, ent);
@@ -139,7 +170,7 @@ SaveResult save_load(Save *self, int slot) {
             ent->x, ent->y);
     }
 
-    if (ent->type == ENT_PLAYER) {
+    if (ent->def->type == ENTITY_PLAYER) {
       self->game->player = ent;
     }
   }
@@ -157,29 +188,42 @@ static SaveResult map_save(const Map *map, FILE *fp) {
 
   for (size_t y = 0; y < map->h; ++y) {
     for (size_t x = 0; x < map->w; ++x) {
-      // We write the flat cell data (Elevation).
-      // Entity/Object pointers are ignored as they are transient/reconstructed.
-      if (fwrite(&map->cells[y][x].elevation, sizeof(Elevation), 1, fp) != 1) {
+      MapCell *cell = &map->cells[y][x];
+      if (fwrite(&cell->elevation, sizeof(Elevation), 1, fp) != 1)
         return SAVE_ERR_WRITE;
-      }
+      if (fwrite(&cell->object_id, sizeof(uint16_t), 1, fp) != 1)
+        return SAVE_ERR_WRITE;
+      if (fwrite(&cell->object_health, sizeof(int), 1, fp) != 1)
+        return SAVE_ERR_WRITE;
     }
   }
   return SAVE_OK;
 }
 
 static SaveResult entity_save(const Entity *ent, FILE *fp) {
-  // 1. Write the Entity struct
-  if (fwrite(ent, sizeof(Entity), 1, fp) != 1)
+  uint16_t def_id = ent->def->id;
+
+  if (fwrite(&def_id, sizeof(uint16_t), 1, fp) != 1)
+    return SAVE_ERR_WRITE;
+  if (fwrite(ent->name, sizeof(char), 32, fp) != 32)
+    return SAVE_ERR_WRITE;
+  if (fwrite(&ent->health, sizeof(int), 1, fp) != 1)
+    return SAVE_ERR_WRITE;
+  if (fwrite(&ent->x, sizeof(size_t), 1, fp) != 1)
+    return SAVE_ERR_WRITE;
+  if (fwrite(&ent->y, sizeof(size_t), 1, fp) != 1)
     return SAVE_ERR_WRITE;
 
-  // 2. Write Inventory items
+  if (fwrite(&ent->inventory.capacity, sizeof(int), 1, fp) != 1)
+    return SAVE_ERR_WRITE;
+  if (fwrite(&ent->inventory.count, sizeof(int), 1, fp) != 1)
+    return SAVE_ERR_WRITE;
+
   for (int i = 0; i < ent->inventory.count; ++i) {
     ItemStack *slot = &ent->inventory.items[i];
+    uint16_t item_def_id = slot->def ? slot->def->id : 0;
 
-    // Convert pointer back to ID
-    int def_id = slot->def ? slot->def->id : -1;
-
-    if (fwrite(&def_id, sizeof(int), 1, fp) != 1)
+    if (fwrite(&item_def_id, sizeof(int), 1, fp) != 1)
       return SAVE_ERR_WRITE;
     if (fwrite(&slot->quantity, sizeof(int), 1, fp) != 1)
       return SAVE_ERR_WRITE;
@@ -196,13 +240,12 @@ static SaveResult game_save(const Game *game, FILE *fp) {
     return SAVE_ERR_WRITE;
   }
 
-  uint64_t count = (uint64_t)game->entities.count;
-  if (fwrite(&count, sizeof(uint64_t), 1, fp) != 1)
+  size_t count = game->entities.count;
+  if (fwrite(&count, sizeof(size_t), 1, fp) != 1)
     return SAVE_ERR_WRITE;
 
   da_foreach(Entity *, it, &game->entities) {
     if (entity_save(*it, fp) != SAVE_OK) {
-
       error("[save] Failed to write entity '%s'", (*it)->name);
       return SAVE_ERR_WRITE;
     }

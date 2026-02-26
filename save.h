@@ -5,6 +5,8 @@
 
 #include "game.h"
 
+#define SAVE_MAGIC 0x47414D45
+#define SAVE_VERSION 3
 #define MAX_N_SLOTS 3
 
 typedef enum {
