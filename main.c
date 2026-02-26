@@ -1,3 +1,5 @@
+#include <time.h>
+
 #include "fcp.h"
 #include "log.h"
 #include "models.h"
@@ -36,68 +38,58 @@ int main() {
 
   options_load();
 
+  int ch;
+
 #define X(name) name##_init();
   AM_MAP(X)
 #undef X
 
-  int ch;
-
   while (next_state != STATE_QUIT) {
     if (next_state != current_state) {
       if (pm) {
-        pm->cleanup();
+        pm->deinit();
       }
 
       current_state = next_state;
       update_activity_ptr(current_state);
 
-      if (pm) {
-        pm->init();
-        pm->render();
-      }
+      pm->init();
     }
 
-    timeout(16);
-
-    if (pm) {
-      ch = getch();
-
-      if (ch != ERR) {
-        if (ch == KEY_RESIZE) {
-          erase();
+    ch = getch();
+    if (ch != ERR) {
+      if (ch == KEY_RESIZE) {
+        erase();
 
 #define X(name) name##_resize();
-          AM_MAP(X)
+        AM_MAP(X)
 #undef X
 
-          pm->resize();
+        pm->resize();
 
-          refresh();
-        } else {
-          static int counter = 0;
-          if (ch == 't')
-            warn("test log no. %d", counter++);
-          else
-            pm->input(ch);
-        }
+        refresh();
+      } else {
+        pm->input(ch);
       }
-
-      pm->render();
     }
 
-#define X(name) name##_render();
+    pm->frame();
+
+#define X(name) name##_frame();
     AM_MAP(X)
 #undef X
 
     doupdate();
+
+    napms(16);
   }
 
-#define X(name) name##_cleanup();
+#define X(name) name##_deinit();
   AM_MAP(X)
 #undef X
 
   if (pm)
-    pm->cleanup();
+    pm->deinit();
 
   endwin();
 

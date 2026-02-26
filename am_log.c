@@ -24,7 +24,15 @@ void log_input(int ch) {
   assert(0 && "Unreachable");
 }
 
-void log_render() {
+void log_deinit() {
+  werase(l_win);
+  wnoutrefresh(l_win);
+  if (l_win) {
+    delwin(l_win);
+  }
+}
+
+void log_frame() {
   if (!l_win)
     return;
 
@@ -68,12 +76,4 @@ void log_resize() {
   int height = LOG_UI_CAPACITY + 1;
   wresize(l_win, height, COLS);
   mvwin(l_win, LINES - height, 0);
-}
-
-void log_cleanup() {
-  werase(l_win);
-  wnoutrefresh(l_win);
-  if (l_win) {
-    delwin(l_win);
-  }
 }

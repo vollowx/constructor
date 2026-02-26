@@ -71,6 +71,20 @@ void saves_init() {
   rebuild_saves_menu();
 }
 
+void saves_deinit() {
+  werase(s_win);
+  werase(s_pre);
+  wnoutrefresh(s_win);
+  wnoutrefresh(s_pre);
+
+  free_menu_ctx(s_win, s_menu, s_items, 3, true);
+
+  if (s_pre) {
+    delwin(s_pre);
+    s_pre = NULL;
+  }
+}
+
 void saves_input(int ch) {
   int slot = item_index(current_item(s_menu));
 
@@ -149,7 +163,7 @@ void saves_input(int ch) {
   }
 }
 
-void saves_render() {
+void saves_frame() {
   if (!s_win || !s_pre)
     return;
 
@@ -195,18 +209,4 @@ void saves_resize() {
   mvwin(s_pre, start_y, start_x + SAVES_WIDTH + 1);
 
   rebuild_saves_menu();
-}
-
-void saves_cleanup() {
-  werase(s_win);
-  werase(s_pre);
-  wnoutrefresh(s_win);
-  wnoutrefresh(s_pre);
-
-  free_menu_ctx(s_win, s_menu, s_items, 3, true);
-
-  if (s_pre) {
-    delwin(s_pre);
-    s_pre = NULL;
-  }
 }

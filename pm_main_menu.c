@@ -36,6 +36,12 @@ void main_menu_init() {
   post_menu(m_menu);
 }
 
+void main_menu_deinit() {
+  werase(m_win);
+  wnoutrefresh(m_win);
+  free_menu_ctx(m_win, m_menu, m_items, MAIN_MENU_N_ITEMS, false);
+}
+
 void main_menu_input(int ch) {
   switch (ch) {
   case KEY_DOWN:
@@ -70,7 +76,7 @@ void main_menu_input(int ch) {
   }
 }
 
-void main_menu_render() {
+void main_menu_frame() {
   box(m_win, 0, 0);
   mvwprintw(m_win, 0, 3, " Constructor ");
   wnoutrefresh(m_win);
@@ -78,10 +84,4 @@ void main_menu_render() {
 
 void main_menu_resize() {
   mvwin(m_win, (LINES - MAIN_MENU_HEIGHT) / 2, (COLS - MAIN_MENU_WIDTH) / 2);
-}
-
-void main_menu_cleanup() {
-  werase(m_win);
-  wnoutrefresh(m_win);
-  free_menu_ctx(m_win, m_menu, m_items, MAIN_MENU_N_ITEMS, false);
 }

@@ -101,6 +101,12 @@ void options_init() {
   rebuild_options_menu();
 }
 
+void options_deinit() {
+  werase(o_win);
+  wnoutrefresh(o_win);
+  free_menu_ctx(o_win, o_menu, o_items, OPTIONS_HEIGHT - 4, false);
+}
+
 void options_input(int ch) {
   switch (ch) {
   case KEY_DOWN:
@@ -137,7 +143,7 @@ void options_input(int ch) {
   }
 }
 
-void options_render() {
+void options_frame() {
   box(o_win, 0, 0);
   mvwprintw(o_win, 0, 3, " Options ");
   wnoutrefresh(o_win);
@@ -146,10 +152,4 @@ void options_render() {
 void options_resize() {
   if (o_win)
     mvwin(o_win, (LINES - OPTIONS_HEIGHT) / 2, (COLS - OPTIONS_WIDTH) / 2);
-}
-
-void options_cleanup() {
-  werase(o_win);
-  wnoutrefresh(o_win);
-  free_menu_ctx(o_win, o_menu, o_items, OPTIONS_HEIGHT - 4, false);
 }

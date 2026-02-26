@@ -53,6 +53,18 @@ void gameplay_init() {
   keypad(g_win, TRUE);
 }
 
+void gameplay_deinit() {
+  werase(g_win);
+  wnoutrefresh(g_win);
+  if (g_win) {
+    delwin(g_win);
+    g_win = NULL;
+  }
+  free_game(current_save.game);
+
+  g_need_redraw = true;
+}
+
 void gameplay_input(int ch) {
   Entity *p = current_save.game->player;
   if (!p)
@@ -122,9 +134,13 @@ void gameplay_input(int ch) {
   }
 }
 
-void gameplay_render() {
-  if (!g_win || !current_save.game || !current_save.game->player)
+// void gameplay_frame(double dt) {
+void gameplay_frame() {
+  if (!g_win || !current_save.game)
     return;
+
+  // game_tick should be called 20 times a sec
+  // game_tick(&game);
 
   if (!g_need_redraw)
     return;
@@ -163,9 +179,6 @@ void gameplay_render() {
 
   attr_t current_attrs = A_NORMAL;
   wattrset(g_win, current_attrs);
-
-  // TODO: Move into game_tick or on player movements
-  // game_gen_area(current_save.game, vy, vx, vy + sh, vx + sw);
 
   for (int y = 0; y < max_y; y++) {
     wmove(g_win, y, 0);
@@ -249,16 +262,4 @@ void gameplay_resize() {
     wresize(g_win, LINES, COLS);
     mvwin(g_win, 0, 0);
   }
-}
-
-void gameplay_cleanup() {
-  werase(g_win);
-  wnoutrefresh(g_win);
-  if (g_win) {
-    delwin(g_win);
-    g_win = NULL;
-  }
-  free_game(current_save.game);
-
-  g_need_redraw = true;
 }

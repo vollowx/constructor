@@ -6,9 +6,9 @@
 typedef struct {
   void (*init)();
   void (*input)(int ch);
-  void (*render)();
+  void (*frame)();
   void (*resize)();
-  void (*cleanup)();
+  void (*deinit)();
 } Model;
 
 #define AM_MAP(X) X(log)
@@ -24,12 +24,13 @@ typedef struct {
 // am_log.c   - Always-on model
 // pm_saves.c - Primary model
 
+// TODO: Consider remove ..._input() functions for always-on models
 #define X(name)                                                                \
   void name##_init();                                                          \
   void name##_input(int ch);                                                   \
-  void name##_render();                                                        \
+  void name##_frame();                                                         \
   void name##_resize();                                                        \
-  void name##_cleanup();                                                       \
+  void name##_deinit();                                                        \
   extern Model model_##name;
 AM_MAP(X)
 #undef X
@@ -37,9 +38,9 @@ AM_MAP(X)
 #define X(state, name)                                                         \
   void name##_init();                                                          \
   void name##_input(int ch);                                                   \
-  void name##_render();                                                        \
+  void name##_frame();                                                         \
   void name##_resize();                                                        \
-  void name##_cleanup();                                                       \
+  void name##_deinit();                                                        \
   extern Model model_##name;
 PM_MAP(X)
 #undef X
