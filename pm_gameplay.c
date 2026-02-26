@@ -60,20 +60,59 @@ void gameplay_input(int ch) {
 
   switch (ch) {
   case KEY_UP:
+  case 'k':
     g_need_redraw = entity_move(p, 0, -1, current_save.game->map);
     break;
   case KEY_DOWN:
+  case 'j':
     g_need_redraw = entity_move(p, 0, 1, current_save.game->map);
     break;
   case KEY_LEFT:
+  case 'h':
     g_need_redraw = entity_move(p, -1, 0, current_save.game->map);
     break;
   case KEY_RIGHT:
+  case 'l':
     g_need_redraw = entity_move(p, 1, 0, current_save.game->map);
     break;
-  case 'i':
     // TASK(20260226-155803): Add object related functions
+  case 'K':
+    current_game.map->cells[current_game.player->y - 1][current_game.player->x]
+        .object_id = 0;
+    g_need_redraw = true;
+    break;
+  case 'J':
     current_game.map->cells[current_game.player->y + 1][current_game.player->x]
+        .object_id = 0;
+    g_need_redraw = true;
+    break;
+  case 'H':
+    current_game.map->cells[current_game.player->y][current_game.player->x - 1]
+        .object_id = 0;
+    g_need_redraw = true;
+    break;
+  case 'L':
+    current_game.map->cells[current_game.player->y][current_game.player->x + 1]
+        .object_id = 0;
+    g_need_redraw = true;
+    break;
+  case '':
+    current_game.map->cells[current_game.player->y - 1][current_game.player->x]
+        .object_id = 10000;
+    g_need_redraw = true;
+    break;
+  case 10: // Vim not inputting ^J somehow
+    current_game.map->cells[current_game.player->y + 1][current_game.player->x]
+        .object_id = 10000;
+    g_need_redraw = true;
+    break;
+  case '':
+    current_game.map->cells[current_game.player->y][current_game.player->x - 1]
+        .object_id = 10000;
+    g_need_redraw = true;
+    break;
+  case '':
+    current_game.map->cells[current_game.player->y][current_game.player->x + 1]
         .object_id = 10000;
     g_need_redraw = true;
     break;
@@ -220,4 +259,6 @@ void gameplay_cleanup() {
     g_win = NULL;
   }
   free_game(current_save.game);
+
+  g_need_redraw = true;
 }
