@@ -39,6 +39,15 @@ extern Logs logs;
 
 #define UNUSED (void)
 
+#define draw_win_frame(win, title, color)                                      \
+  do {                                                                         \
+    wattron(win, COLOR_PAIR(fcp_get(color, COLOR_BLACK)));                     \
+    box(win, 0, 0);                                                            \
+    wattron(win, A_BOLD);                                                      \
+    mvwprintw(win, 0, 3, " %s ", title);                                       \
+    wattroff(win, COLOR_PAIR(fcp_get(color, COLOR_BLACK)) | A_BOLD);           \
+  } while (0)
+
 #define free_menu_ctx(win, menu, items, n_items, owns_labels)                  \
   do {                                                                         \
     if (menu) {                                                                \

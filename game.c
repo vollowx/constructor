@@ -303,6 +303,7 @@ void game_gen_area(Game *game, size_t start_y, size_t start_x, size_t end_y,
 }
 
 bool game_tick(Game *game, double dt) {
+  UNUSED(game);
   UNUSED(dt);
 
   bool updated = false;

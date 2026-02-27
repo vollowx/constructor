@@ -5,6 +5,8 @@
 #include "models.h"
 #include "options.h"
 
+#define FPS 60
+
 int current_slot = 0;
 GameState next_state = STATE_MAIN_MENU;
 GameState current_state = (GameState)-1;
@@ -88,7 +90,7 @@ int main() {
 
     doupdate();
 
-    napms(16);
+    napms(1000 / FPS);
   }
 
   if (pm)

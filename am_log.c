@@ -52,7 +52,9 @@ void log_frame(double dt) {
   was_showing = true;
 
   werase(l_win);
+  wattron(l_win, COLOR_PAIR(fcp_get(COLOR_MAGENTA, COLOR_BLACK)));
   mvwhline(l_win, 0, 0, ACS_HLINE, COLS);
+  wattroff(l_win, COLOR_PAIR(fcp_get(COLOR_MAGENTA, COLOR_BLACK)));
 
   size_t line = LOG_UI_CAPACITY;
   size_t i = logs.count;

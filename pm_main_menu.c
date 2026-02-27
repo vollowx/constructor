@@ -2,6 +2,7 @@
 
 #include <menu.h>
 
+#include "fcp.h"
 #include "helpers.h"
 #include "log.h"
 #include "models.h"
@@ -33,6 +34,8 @@ void main_menu_init() {
   set_menu_sub(m_menu,
                derwin(m_win, MAIN_MENU_HEIGHT - 4, MAIN_MENU_WIDTH - 4, 2, 1));
   set_menu_mark(m_menu, " > ");
+  set_menu_fore(m_menu, COLOR_PAIR(fcp_get(COLOR_BLUE, COLOR_BLACK)) | A_BOLD |
+                            A_REVERSE);
   post_menu(m_menu);
 }
 
@@ -78,8 +81,7 @@ void main_menu_input(int ch) {
 
 void main_menu_frame(double dt) {
   UNUSED(dt);
-  box(m_win, 0, 0);
-  mvwprintw(m_win, 0, 3, " Constructor ");
+  draw_win_frame(m_win, "Constructor", COLOR_BLUE);
   wnoutrefresh(m_win);
 }
 

@@ -2,6 +2,7 @@
 
 #include <menu.h>
 
+#include "fcp.h"
 #include "helpers.h"
 #include "log.h"
 #include "models.h"
@@ -50,6 +51,8 @@ void rebuild_saves_menu() {
   set_menu_win(s_menu, s_win);
   set_menu_sub(s_menu, derwin(s_win, SAVES_HEIGHT - 4, SAVES_WIDTH - 4, 2, 1));
   set_menu_mark(s_menu, " > ");
+  set_menu_fore(s_menu, COLOR_PAIR(fcp_get(COLOR_BLUE, COLOR_BLACK)) | A_BOLD |
+                            A_REVERSE);
   set_current_item(s_menu, s_items[current_slot]);
 
   post_menu(s_menu);
@@ -107,6 +110,7 @@ void saves_input(int ch) {
     break;
 
   case 10:
+  case 'o':
     if (previews[slot].exists) {
       next_state = STATE_GAMEPLAY;
     } else {
@@ -128,6 +132,9 @@ void saves_input(int ch) {
     // next_state = STATE_SAVE_DELETE
     break;
   case 'r':
+    if (!previews[slot].exists)
+      break;
+
     echo();
     curs_set(1);
 
@@ -169,13 +176,11 @@ void saves_frame(double dt) {
   if (!s_win || !s_pre)
     return;
 
-  box(s_win, 0, 0);
-  mvwprintw(s_win, 0, 3, " Select Save ");
+  draw_win_frame(s_win, "Select Save", COLOR_BLUE);
   wnoutrefresh(s_win);
 
   werase(s_pre);
-  box(s_pre, 0, 0);
-  mvwprintw(s_pre, 0, 3, " Preview ");
+  draw_win_frame(s_pre, "Preview", COLOR_CYAN);
 
   int idx = item_index(current_item(s_menu));
   if (previews[idx].exists) {

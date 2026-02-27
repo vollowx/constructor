@@ -3,6 +3,7 @@
 
 #include <menu.h>
 
+#include "fcp.h"
 #include "helpers.h"
 #include "log.h"
 #include "models.h"
@@ -85,8 +86,11 @@ void rebuild_options_menu() {
 
   o_menu = new_menu(o_items);
   set_menu_win(o_menu, o_win);
-  set_menu_sub(o_menu, derwin(o_win, OPTIONS_HEIGHT - 4, OPTIONS_WIDTH - 4, 2, 1));
+  set_menu_sub(o_menu,
+               derwin(o_win, OPTIONS_HEIGHT - 4, OPTIONS_WIDTH - 4, 2, 1));
   set_menu_mark(o_menu, " > ");
+  set_menu_fore(o_menu, COLOR_PAIR(fcp_get(COLOR_BLUE, COLOR_BLACK)) | A_BOLD |
+                            A_REVERSE);
   set_current_item(o_menu, o_items[current_idx]);
 
   post_menu(o_menu);
@@ -145,8 +149,7 @@ void options_input(int ch) {
 
 void options_frame(double dt) {
   UNUSED(dt);
-  box(o_win, 0, 0);
-  mvwprintw(o_win, 0, 3, " Options ");
+  draw_win_frame(o_win, "Options", COLOR_BLUE);
   wnoutrefresh(o_win);
 }
 
