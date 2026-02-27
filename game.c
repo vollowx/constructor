@@ -61,7 +61,7 @@ const ObjectDef *object_get_def(int id) {
   return NULL;
 }
 
-bool entity_move(Entity *e, int dx, int dy, Map *map) {
+bool entity_move(Entity *e, Map *map, int dx, int dy) {
   if (!e || !map)
     return false;
 
@@ -91,6 +91,40 @@ bool entity_move(Entity *e, int dx, int dy, Map *map) {
   e->y = new_y;
 
   target->entity = e;
+
+  return true;
+}
+
+bool entity_place_object(Entity *e, Map *map, uint16_t object_id, int dx,
+                         int dy) {
+  if (!e || !map || !map->cells) {
+    error("[entity_place_object] NULL pointer passed (e: %p, map: %p)",
+          (void *)e, (void *)map);
+    return false;
+  }
+
+  int tx = (int)e->x + dx;
+  int ty = (int)e->y + dy;
+
+  if (tx < 0 || ty < 0 || (size_t)tx >= map->w || (size_t)ty >= map->h) {
+    error("entity_place_object: Target (%d, %d) out of bounds", tx, ty);
+    return false;
+  }
+
+  MapCell *target_cell = &map->cells[ty][tx];
+
+  if (target_cell->object_id != 0 && object_id != 0) {
+    warn("[entity_place_object] Cell (%d, %d) occupied by object %u", tx, ty,
+         target_cell->object_id);
+    return false;
+  }
+
+  if (target_cell->entity != NULL) {
+    warn("entity_place_object: Cell (%d, %d) occupied by entity", tx, ty);
+    return false;
+  }
+
+  target_cell->object_id = object_id;
 
   return true;
 }
@@ -266,4 +300,19 @@ void game_gen_area(Game *game, size_t start_y, size_t start_x, size_t end_y,
       }
     }
   }
+}
+
+bool game_tick(Game *game, double dt) {
+  UNUSED(dt);
+
+  bool updated = false;
+
+  // What a typhoon
+  // da_foreach(Entity *, e, &game->entities) {
+  //   if (entity_move(*e, game->map, 1, 0)) {
+  //     updated = true;
+  //   }
+  // }
+
+  return updated;
 }

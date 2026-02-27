@@ -32,7 +32,9 @@ void log_deinit() {
   }
 }
 
-void log_frame() {
+void log_frame(double dt) {
+  UNUSED(dt);
+
   if (!l_win)
     return;
 

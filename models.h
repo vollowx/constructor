@@ -6,7 +6,7 @@
 typedef struct {
   void (*init)();
   void (*input)(int ch);
-  void (*frame)();
+  void (*frame)(double dt);
   void (*resize)();
   void (*deinit)();
 } Model;
@@ -28,7 +28,7 @@ typedef struct {
 #define X(name)                                                                \
   void name##_init();                                                          \
   void name##_input(int ch);                                                   \
-  void name##_frame();                                                         \
+  void name##_frame(double dt);                                                \
   void name##_resize();                                                        \
   void name##_deinit();                                                        \
   extern Model model_##name;
@@ -38,7 +38,7 @@ AM_MAP(X)
 #define X(state, name)                                                         \
   void name##_init();                                                          \
   void name##_input(int ch);                                                   \
-  void name##_frame();                                                         \
+  void name##_frame(double dt);                                                \
   void name##_resize();                                                        \
   void name##_deinit();                                                        \
   extern Model model_##name;

@@ -124,7 +124,9 @@ const ItemDef *item_get_def(int id);
 const EntityDef *entity_get_def(int id);
 const ObjectDef *object_get_def(int id);
 
-bool entity_move(Entity *e, int dx, int dy, Map *map);
+bool entity_move(Entity *e, Map *map, int dx, int dy);
+bool entity_place_object(Entity *e, Map *map, uint16_t object_id, int dx,
+                         int dy);
 
 Map *new_map(size_t height, size_t width);
 void free_map(Map *map);
@@ -133,6 +135,6 @@ void free_game(Game *game);
 void game_init(Game *game);
 void game_gen_area(Game *game, size_t start_y, size_t start_x, size_t end_y,
                    size_t end_x);
-void game_tick(Game *game);
+bool game_tick(Game *game, double dt);
 
 #endif

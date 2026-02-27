@@ -163,7 +163,9 @@ void saves_input(int ch) {
   }
 }
 
-void saves_frame() {
+void saves_frame(double dt) {
+  UNUSED(dt);
+
   if (!s_win || !s_pre)
     return;
 

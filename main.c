@@ -38,6 +38,9 @@ int main() {
 
   options_load();
 
+  struct timespec last_frame, current_frame;
+  clock_gettime(CLOCK_MONOTONIC, &last_frame);
+
   int ch;
 
 #define X(name) name##_init();
@@ -45,6 +48,11 @@ int main() {
 #undef X
 
   while (next_state != STATE_QUIT) {
+    clock_gettime(CLOCK_MONOTONIC, &current_frame);
+    double dt = (current_frame.tv_sec - last_frame.tv_sec) +
+                (current_frame.tv_nsec - last_frame.tv_nsec) / 1e9;
+    last_frame = current_frame;
+
     if (next_state != current_state) {
       if (pm) {
         pm->deinit();
@@ -57,25 +65,24 @@ int main() {
     }
 
     ch = getch();
-    if (ch != ERR) {
-      if (ch == KEY_RESIZE) {
-        erase();
+    if (ch == KEY_RESIZE) {
+      erase();
 
+      if (pm)
+        pm->resize();
 #define X(name) name##_resize();
-        AM_MAP(X)
+      AM_MAP(X)
 #undef X
 
-        pm->resize();
-
-        refresh();
-      } else {
+      refresh();
+    } else {
+      if (pm)
         pm->input(ch);
-      }
     }
 
-    pm->frame();
-
-#define X(name) name##_frame();
+    if (pm)
+      pm->frame(dt);
+#define X(name) name##_frame(dt);
     AM_MAP(X)
 #undef X
 
@@ -84,12 +91,11 @@ int main() {
     napms(16);
   }
 
+  if (pm)
+    pm->deinit();
 #define X(name) name##_deinit();
   AM_MAP(X)
 #undef X
-
-  if (pm)
-    pm->deinit();
 
   endwin();
 

@@ -143,7 +143,8 @@ void options_input(int ch) {
   }
 }
 
-void options_frame() {
+void options_frame(double dt) {
+  UNUSED(dt);
   box(o_win, 0, 0);
   mvwprintw(o_win, 0, 3, " Options ");
   wnoutrefresh(o_win);

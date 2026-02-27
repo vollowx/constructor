@@ -72,20 +72,22 @@ void gameplay_input(int ch) {
 
   switch (ch) {
   case KEY_UP:
+    // TASK(20260227-142821): Redesign player movement, consider add into
+    // game_tick and add velocity
   case 'k':
-    g_need_redraw = entity_move(p, 0, -1, current_save.game->map);
+    g_need_redraw = entity_move(current_game.player, current_game.map, 0, -1);
     break;
   case KEY_DOWN:
   case 'j':
-    g_need_redraw = entity_move(p, 0, 1, current_save.game->map);
+    g_need_redraw = entity_move(current_game.player, current_game.map, 0, 1);
     break;
   case KEY_LEFT:
   case 'h':
-    g_need_redraw = entity_move(p, -1, 0, current_save.game->map);
+    g_need_redraw = entity_move(current_game.player, current_game.map, -1, 0);
     break;
   case KEY_RIGHT:
   case 'l':
-    g_need_redraw = entity_move(p, 1, 0, current_save.game->map);
+    g_need_redraw = entity_move(current_game.player, current_game.map, 1, 0);
     break;
     // TASK(20260226-155803): Add object related functions
   case 'K':
@@ -109,24 +111,20 @@ void gameplay_input(int ch) {
     g_need_redraw = true;
     break;
   case '':
-    current_game.map->cells[current_game.player->y - 1][current_game.player->x]
-        .object_id = 10000;
-    g_need_redraw = true;
+    g_need_redraw = entity_place_object(current_game.player, current_game.map,
+                                        10000, 0, -1);
     break;
   case 10: // Vim not inputting ^J somehow
-    current_game.map->cells[current_game.player->y + 1][current_game.player->x]
-        .object_id = 10000;
-    g_need_redraw = true;
+    g_need_redraw =
+        entity_place_object(current_game.player, current_game.map, 10000, 0, 1);
     break;
   case '':
-    current_game.map->cells[current_game.player->y][current_game.player->x - 1]
-        .object_id = 10000;
-    g_need_redraw = true;
+    g_need_redraw = entity_place_object(current_game.player, current_game.map,
+                                        10000, -1, 0);
     break;
   case '':
-    current_game.map->cells[current_game.player->y][current_game.player->x + 1]
-        .object_id = 10000;
-    g_need_redraw = true;
+    g_need_redraw =
+        entity_place_object(current_game.player, current_game.map, 10000, 1, 0);
     break;
   case 'q':
     next_state = STATE_SAVES;
@@ -134,13 +132,21 @@ void gameplay_input(int ch) {
   }
 }
 
-// void gameplay_frame(double dt) {
-void gameplay_frame() {
+void gameplay_frame(double dt) {
   if (!g_win || !current_save.game)
     return;
 
-  // game_tick should be called 20 times a sec
-  // game_tick(&game);
+  static double tick_accumulator = 0;
+  const double tick_rate = 1.0 / 20.0;
+
+  tick_accumulator += dt;
+  while (tick_accumulator >= tick_rate) {
+    // game_tick should be called 20 times a sec
+    if (game_tick(&current_game, tick_rate)) {
+      g_need_redraw = true;
+    }
+    tick_accumulator -= tick_rate;
+  }
 
   if (!g_need_redraw)
     return;

@@ -76,7 +76,8 @@ void main_menu_input(int ch) {
   }
 }
 
-void main_menu_frame() {
+void main_menu_frame(double dt) {
+  UNUSED(dt);
   box(m_win, 0, 0);
   mvwprintw(m_win, 0, 3, " Constructor ");
   wnoutrefresh(m_win);
