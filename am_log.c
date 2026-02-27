@@ -11,9 +11,9 @@ WINDOW *l_win = NULL;
 static short log_cp[3];
 
 void log_init() {
-  log_cp[LOG_INFO] = fcp_get(COLOR_BLUE, COLOR_BLACK);
-  log_cp[LOG_WARNING] = fcp_get(COLOR_YELLOW, COLOR_BLACK);
-  log_cp[LOG_ERROR] = fcp_get(COLOR_RED, COLOR_BLACK);
+  log_cp[LOG_INFO] = fcp_get(COLOR_BLUE, -1);
+  log_cp[LOG_WARNING] = fcp_get(COLOR_YELLOW, -1);
+  log_cp[LOG_ERROR] = fcp_get(COLOR_RED, -1);
 
   int height = LOG_UI_CAPACITY + 1;
   l_win = newwin(height, COLS, LINES - height, 0);
@@ -52,9 +52,9 @@ void log_frame(double dt) {
   was_showing = true;
 
   werase(l_win);
-  wattron(l_win, COLOR_PAIR(fcp_get(COLOR_MAGENTA, COLOR_BLACK)));
+  wattron(l_win, COLOR_PAIR(fcp_get(COLOR_MAGENTA, -1)));
   mvwhline(l_win, 0, 0, ACS_HLINE, COLS);
-  wattroff(l_win, COLOR_PAIR(fcp_get(COLOR_MAGENTA, COLOR_BLACK)));
+  wattroff(l_win, COLOR_PAIR(fcp_get(COLOR_MAGENTA, -1)));
 
   size_t line = LOG_UI_CAPACITY;
   size_t i = logs.count;

@@ -51,8 +51,8 @@ void rebuild_saves_menu() {
   set_menu_win(s_menu, s_win);
   set_menu_sub(s_menu, derwin(s_win, SAVES_HEIGHT - 4, SAVES_WIDTH - 4, 2, 1));
   set_menu_mark(s_menu, " > ");
-  set_menu_fore(s_menu, COLOR_PAIR(fcp_get(COLOR_BLUE, COLOR_BLACK)) | A_BOLD |
-                            A_REVERSE);
+  set_menu_fore(s_menu,
+                COLOR_PAIR(fcp_get(COLOR_BLUE, -1)) | A_BOLD | A_REVERSE);
   set_current_item(s_menu, s_items[current_slot]);
 
   post_menu(s_menu);

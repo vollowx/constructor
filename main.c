@@ -35,7 +35,14 @@ int main() {
   nodelay(stdscr, TRUE);
   curs_set(0);
 
+  if (!has_colors()) {
+    printw("Your terminal does not support color. Press any key to quit.");
+    getch();
+    return 1;
+  }
+
   start_color();
+  use_default_colors();
   fcp_init();
 
   options_load();

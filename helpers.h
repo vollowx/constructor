@@ -41,11 +41,11 @@ extern Logs logs;
 
 #define draw_win_frame(win, title, color)                                      \
   do {                                                                         \
-    wattron(win, COLOR_PAIR(fcp_get(color, COLOR_BLACK)));                     \
+    wattron(win, COLOR_PAIR(fcp_get(color, -1)));                              \
     box(win, 0, 0);                                                            \
     wattron(win, A_BOLD);                                                      \
     mvwprintw(win, 0, 3, " %s ", title);                                       \
-    wattroff(win, COLOR_PAIR(fcp_get(color, COLOR_BLACK)) | A_BOLD);           \
+    wattroff(win, COLOR_PAIR(fcp_get(color, -1)) | A_BOLD);                    \
   } while (0)
 
 #define free_menu_ctx(win, menu, items, n_items, owns_labels)                  \

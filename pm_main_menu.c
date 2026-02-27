@@ -34,8 +34,8 @@ void main_menu_init() {
   set_menu_sub(m_menu,
                derwin(m_win, MAIN_MENU_HEIGHT - 4, MAIN_MENU_WIDTH - 4, 2, 1));
   set_menu_mark(m_menu, " > ");
-  set_menu_fore(m_menu, COLOR_PAIR(fcp_get(COLOR_BLUE, COLOR_BLACK)) | A_BOLD |
-                            A_REVERSE);
+  set_menu_fore(m_menu,
+                COLOR_PAIR(fcp_get(COLOR_BLUE, -1)) | A_BOLD | A_REVERSE);
   post_menu(m_menu);
 }
 

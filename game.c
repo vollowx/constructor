@@ -29,6 +29,7 @@ EntityDef ENTITY_DB[] = {
 
 ObjectDef OBJECT_DB[] = {
     // In this case 0 is the default object_id for cells
+    // TASK(20260227-172726): Add reverse option to get the real black color from the terminal
     {.id = 1,     .name = "Wood Bridge",   .max_health = 1,  .is_passable = true , .symbol = {'#', '#'}, .fg = COLOR_BLACK, .bg = COLOR_YELLOW},
     {.id = 2,     .name = "Stone Boulder", .max_health = 5,  .is_passable = false, .symbol = {'O', 'O'}, .fg = COLOR_BLACK, .bg = COLOR_WHITE},
     {.id = 3,     .name = "Furnace",       .max_health = 10, .is_passable = false, .symbol = {'&', '&'}, .fg = COLOR_BLACK, .bg = COLOR_WHITE},

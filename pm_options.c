@@ -89,8 +89,8 @@ void rebuild_options_menu() {
   set_menu_sub(o_menu,
                derwin(o_win, OPTIONS_HEIGHT - 4, OPTIONS_WIDTH - 4, 2, 1));
   set_menu_mark(o_menu, " > ");
-  set_menu_fore(o_menu, COLOR_PAIR(fcp_get(COLOR_BLUE, COLOR_BLACK)) | A_BOLD |
-                            A_REVERSE);
+  set_menu_fore(o_menu,
+                COLOR_PAIR(fcp_get(COLOR_BLUE, -1)) | A_BOLD | A_REVERSE);
   set_current_item(o_menu, o_items[current_idx]);
 
   post_menu(o_menu);
