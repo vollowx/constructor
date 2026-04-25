@@ -18,7 +18,8 @@ typedef struct {
   X(MAIN_MENU, main_menu)                                                      \
   X(SAVES, saves)                                                              \
   X(GAMEPLAY, gameplay)                                                        \
-  X(OPTIONS, options)
+  X(OPTIONS, options)                                                          \
+  X(ABOUT, about)
 
 // Implementation filename e.g.
 // am_log.c   - Always-on model

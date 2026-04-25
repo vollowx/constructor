@@ -97,7 +97,7 @@ void rebuild_options_menu() {
 }
 
 void options_init() {
-  info("[model] model_options initializing");
+  info("[model] major = options");
 
   o_win = newwin(OPTIONS_HEIGHT, OPTIONS_WIDTH, (LINES - OPTIONS_HEIGHT) / 2,
                  (COLS - OPTIONS_WIDTH) / 2);

@@ -32,7 +32,7 @@ bool g_is_first_run = true;
 bool g_need_redraw = true;
 
 void gameplay_init() {
-  info("[model] model_gameplay initializing");
+  info("[model] major = gameplay");
 
   if (g_is_first_run) {
     current_save.game = &current_game;

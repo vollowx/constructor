@@ -16,7 +16,7 @@ MENU *m_menu;
 WINDOW *m_win;
 
 void main_menu_init() {
-  info("[model] model_main_menu initializing");
+  info("[model] major = main_menu");
 
   char *labels[] = {"Start Game", "Options", "About",
                     "Quit                         ", (char *)NULL};
@@ -68,7 +68,7 @@ void main_menu_input(int ch) {
       next_state = STATE_OPTIONS;
       break;
     case 2:
-      // next_state = STATE_ABOUT;
+      next_state = STATE_ABOUT;
       break;
     case 3:
       next_state = STATE_QUIT;

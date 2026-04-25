@@ -59,7 +59,7 @@ void rebuild_saves_menu() {
 }
 
 void saves_init() {
-  info("[model] model_saves initializing");
+  info("[model] major = saves");
 
   //                          gap
   int total_w = SAVES_WIDTH + 1 + PREVIEW_WIDTH;

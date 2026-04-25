@@ -6,7 +6,11 @@ TARGET=constructor
 
 SRC=main.c fcp.c game.c log.c models.c options.c save.c \
     minor_log.c \
-    major_main_menu.c major_saves.c major_gameplay.c major_options.c \
+    major_main_menu.c \
+    major_saves.c \
+    major_gameplay.c \
+    major_options.c \
+    major_about.c \
     thirdparty/simplexnoise1234.c
 
 all: $(TARGET)

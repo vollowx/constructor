@@ -11,6 +11,8 @@ WINDOW *l_win = NULL;
 static short log_cp[3];
 
 void log_init() {
+  info("[model] minor += log");
+
   log_cp[LOG_INFO] = fcp_get(COLOR_BLUE, -1);
   log_cp[LOG_WARNING] = fcp_get(COLOR_YELLOW, -1);
   log_cp[LOG_ERROR] = fcp_get(COLOR_RED, -1);
