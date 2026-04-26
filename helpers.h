@@ -27,9 +27,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "fcp.h"
 #include "log.h"
 #include "models.h"
 #include "options.h"
+
+#define CONSTRUCTOR_VERSION_MAJOR 0
+#define CONSTRUCTOR_VERSION_MINOR 0
+#define CONSTRUCTOR_VERSION_PATCH 0
 
 extern GameOptions current_options;
 extern int current_slot;
