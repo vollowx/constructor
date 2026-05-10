@@ -8,7 +8,7 @@ triggers:
       to: "<vollowx@outlook.com>"
 tasks:
     - build: |
-             cd constructor
+             cd charwild
              make -k
 submitter:
     git.sr.ht:
