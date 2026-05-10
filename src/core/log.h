@@ -28,6 +28,6 @@ typedef struct {
 } Logs;
 
 void log_message(LogLevel level, const char *fmt, ...);
-void free_logs();
+void free_logs(void);
 
 #endif

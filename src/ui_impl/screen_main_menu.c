@@ -1,9 +1,9 @@
 #include <menu.h>
 
-#include "ui/app_state.h"
-#include "ui/fcp.h"
 #include "core/helpers.h"
 #include "core/log.h"
+#include "ui/fcp.h"
+#include "ui/state.h"
 
 #define MAIN_MENU_HEIGHT 8
 #define MAIN_MENU_WIDTH 36
@@ -13,7 +13,7 @@ ITEM **m_items;
 MENU *m_menu;
 WINDOW *m_win;
 
-void main_menu_init(AppContext *ctx) {
+void main_menu_init(PrgContext *ctx) {
     info("[model] major = main_menu");
 
     char *labels[] = {"Start Game", "Options", "About",
@@ -38,13 +38,13 @@ void main_menu_init(AppContext *ctx) {
     post_menu(m_menu);
 }
 
-void main_menu_deinit() {
+void main_menu_deinit(void) {
     werase(m_win);
     wnoutrefresh(m_win);
     free_menu_ctx(m_win, m_menu, m_items, MAIN_MENU_N_ITEMS, false);
 }
 
-void main_menu_input(AppContext *ctx) {
+void main_menu_input(PrgContext *ctx) {
     switch (ctx->ch) {
     case KEY_DOWN:
     case 'j':
@@ -84,6 +84,6 @@ void main_menu_frame(double dt) {
     wnoutrefresh(m_win);
 }
 
-void main_menu_resize(AppContext *ctx) {
+void main_menu_resize(PrgContext *ctx) {
     mvwin(m_win, (LINES - MAIN_MENU_HEIGHT) / 2, (COLS - MAIN_MENU_WIDTH) / 2);
 }

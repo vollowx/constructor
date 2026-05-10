@@ -118,7 +118,7 @@ typedef struct {
     Map *map;
     Entity *player;
     Entities entities;
-} Game;
+} World;
 
 const ItemDef *item_get_def(int id);
 const EntityDef *entity_get_def(int id);
@@ -131,10 +131,11 @@ bool entity_place_object(Entity *e, Map *map, uint16_t object_id, int dx,
 Map *new_map(size_t height, size_t width);
 void free_map(Map *map);
 
-void free_game(Game *game);
-void game_init(Game *game);
-void game_gen_area(Game *game, size_t start_y, size_t start_x, size_t end_y,
-                   size_t end_x);
-bool game_tick(Game *game, double dt);
+void free_world(World *);
+void world_init(World *);
+void world_gen_area(World *, size_t y1, size_t x1, size_t y2, size_t x2);
+bool world_tick(World *, double dt);
+bool world_tick_animals(World *, double dt);
+bool world_tick_world(World *, double dt);
 
 #endif

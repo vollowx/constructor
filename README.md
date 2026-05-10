@@ -1,6 +1,6 @@
-# Constructor
+# charwild
 
-[![builds.sr.ht status](https://builds.sr.ht/~lucaz/constructor.svg)](https://builds.sr.ht/~lucaz/constructor?)
+[![builds.sr.ht status](https://builds.sr.ht/~lucaz/charwild.svg)](https://builds.sr.ht/~lucaz/charwild?)
 
 - `make`
 - `gcc`
@@ -8,5 +8,5 @@
 
 ```sh
 make
-./constructor
+./build/charwild
 ```

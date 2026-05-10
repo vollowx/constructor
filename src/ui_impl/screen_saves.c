@@ -1,10 +1,10 @@
 #include <menu.h>
 
-#include "ui/app_state.h"
-#include "ui/fcp.h"
 #include "core/helpers.h"
 #include "core/log.h"
 #include "core/save.h"
+#include "ui/fcp.h"
+#include "ui/state.h"
 
 // menu height = 3, padding = 1 * 2, border = 1 * 2
 #define SAVES_HEIGHT 7
@@ -18,7 +18,7 @@ static WINDOW *s_win = NULL;
 static WINDOW *s_pre = NULL;
 static SavePreview previews[3];
 
-void rebuild_saves_menu(AppContext *ctx) {
+void rebuild_saves_menu(PrgContext *ctx) {
     if (s_menu) {
         unpost_menu(s_menu);
         free_menu(s_menu);
@@ -58,7 +58,7 @@ void rebuild_saves_menu(AppContext *ctx) {
     post_menu(s_menu);
 }
 
-void saves_init(AppContext *ctx) {
+void saves_init(PrgContext *ctx) {
     info("[model] major = saves");
 
     //                          gap
@@ -74,7 +74,7 @@ void saves_init(AppContext *ctx) {
     rebuild_saves_menu(ctx);
 }
 
-void saves_deinit() {
+void saves_deinit(void) {
     werase(s_win);
     werase(s_pre);
     wnoutrefresh(s_win);
@@ -88,7 +88,7 @@ void saves_deinit() {
     }
 }
 
-void saves_input(AppContext *ctx) {
+void saves_input(PrgContext *ctx) {
     int slot = item_index(current_item(s_menu));
 
     ITEM *cur = current_item(s_menu);
@@ -114,14 +114,14 @@ void saves_input(AppContext *ctx) {
         if (previews[slot].exists) {
             ctx->next_state = APP_STATE_GAMEPLAY;
         } else {
-            Game game = {0};
-            game_init(&game);
+            World world = {0};
+            world_init(&world);
             Save save = {0};
-            save.game = &game;
+            save.world = &world;
             save_init(&save);
-            strcpy(save.header.player_name, game.player->name);
+            strcpy(save.header.player_name, world.player->name);
             save_save(&save, slot);
-            free_game(&game);
+            free_world(&world);
 
             rebuild_saves_menu(ctx);
         }
@@ -148,9 +148,9 @@ void saves_input(AppContext *ctx) {
         curs_set(0);
 
         if (strlen(new_name) > 0) {
-            Game game = {0};
+            World game = {0};
             Save save = {0};
-            save.game = &game;
+            save.world = &game;
             if (save_load(&save, slot) == SAVE_OK) {
                 strcpy(save.header.player_name, new_name);
                 strcpy(game.player->name, new_name);
@@ -162,7 +162,7 @@ void saves_input(AppContext *ctx) {
             } else {
                 error("[save] Failed to rename slot loading save");
             }
-            free_game(save.game);
+            free_world(save.world);
         }
 
         rebuild_saves_menu(ctx);
@@ -204,7 +204,7 @@ void saves_frame(double dt) {
     wnoutrefresh(s_pre);
 }
 
-void saves_resize(AppContext *ctx) {
+void saves_resize(PrgContext *ctx) {
     if (!s_win || !s_pre)
         return;
 

@@ -3,8 +3,8 @@
 #include <ncurses.h>
 #include <simplexnoise1234.h>
 
-#include "core/game.h"
 #include "core/helpers.h"
+#include "core/world.h"
 
 // clang-format off
 ItemDef ITEM_DB[] = {
@@ -177,12 +177,12 @@ void free_map(Map *map) {
 }
 
 // TASK(20260223-173936): Chunk-ize game both in struct and file
-void game_init(Game *game) {
-    game->map = new_map(2048, 2048);
+void world_init(World *w) {
+    w->map = new_map(2048, 2048);
 
-    game->entities.items = NULL;
-    game->entities.count = 0;
-    game->entities.capacity = 0;
+    w->entities.items = NULL;
+    w->entities.count = 0;
+    w->entities.capacity = 0;
 
     Entity *player = malloc(sizeof(Entity));
     memset(player, 0, sizeof(Entity));
@@ -196,17 +196,17 @@ void game_init(Game *game) {
     player->inventory.items =
         malloc(sizeof(ItemStack) * player->inventory.capacity);
 
-    da_append(&game->entities, player);
-    game->player = player;
+    da_append(&w->entities, player);
+    w->player = player;
 
     srand((unsigned int)time(NULL));
-    game->seed = ((uint32_t)rand() << 16) | (uint32_t)rand();
+    w->seed = ((uint32_t)rand() << 16) | (uint32_t)rand();
 
     size_t py = 1024, px = 1024, y_offset = 0;
-    game_gen_area(game, py - 256, px - 256, py + 256, px + 256);
+    world_gen_area(w, py - 256, px - 256, py + 256, px + 256);
 
     // TODO: Fails in a rather small possibility
-    while (game->map->cells[py + y_offset][px].elevation != ELEV_GROUND &&
+    while (w->map->cells[py + y_offset][px].elevation != ELEV_GROUND &&
            y_offset < 256) {
         ++y_offset;
     }
@@ -214,19 +214,19 @@ void game_init(Game *game) {
 
     player->y = py;
     player->x = px;
-    game->map->cells[player->y][player->x].entity = player;
+    w->map->cells[player->y][player->x].entity = player;
 }
 
-void free_game(Game *game) {
-    if (!game)
+void free_world(World *w) {
+    if (!w)
         return;
 
-    if (game->map) {
-        free_map(game->map);
-        game->map = NULL;
+    if (w->map) {
+        free_map(w->map);
+        w->map = NULL;
     }
 
-    da_foreach(Entity *, it, &game->entities) {
+    da_foreach(Entity *, it, &w->entities) {
         Entity *ent = *it;
         if (ent) {
             if (ent->inventory.items) {
@@ -236,27 +236,26 @@ void free_game(Game *game) {
         }
     }
 
-    if (game->entities.items) {
-        free(game->entities.items);
-        game->entities.items = NULL;
+    if (w->entities.items) {
+        free(w->entities.items);
+        w->entities.items = NULL;
     }
 
-    game->entities.count = 0;
-    game->entities.capacity = 0;
-    game->player = NULL;
+    w->entities.count = 0;
+    w->entities.capacity = 0;
+    w->player = NULL;
 }
 
-void game_gen_area(Game *game, size_t start_y, size_t start_x, size_t end_y,
-                   size_t end_x) {
-    if (!game || !game->map)
+void world_gen_area(World *w, size_t y1, size_t x1, size_t y2, size_t x2) {
+    if (!w || !w->map)
         return;
-    Map *map = game->map;
+    Map *map = w->map;
 
-    float seed_ox = (float)(game->seed % 100000);
-    float seed_oy = (float)((game->seed / 100) % 100000);
+    float seed_ox = (float)(w->seed % 100000);
+    float seed_oy = (float)((w->seed / 100) % 100000);
 
-    for (size_t y = start_y; y < end_y && y < map->h; y++) {
-        for (size_t x = start_x; x < end_x && x < map->w; x++) {
+    for (size_t y = y1; y < y2 && y < map->h; y++) {
+        for (size_t x = x1; x < x2 && x < map->w; x++) {
             MapCell *cell = &map->cells[y][x];
 
             if (cell->elevation == ELEV_NONE) {
@@ -279,7 +278,7 @@ void game_gen_area(Game *game, size_t start_y, size_t start_x, size_t end_y,
 
                 if (cell->elevation == ELEV_GROUND ||
                     cell->elevation == ELEV_HILL) {
-                    uint32_t res_h = game->seed ^ ((uint32_t)x * 123456789U) ^
+                    uint32_t res_h = w->seed ^ ((uint32_t)x * 123456789U) ^
                                      ((uint32_t)y * 987654321U);
 
                     uint32_t spawn_threshold =
@@ -297,7 +296,7 @@ void game_gen_area(Game *game, size_t start_y, size_t start_x, size_t end_y,
                                     sizeof(res->name) - 1);
 
                             cell->entity = res;
-                            da_append(&game->entities, res);
+                            da_append(&w->entities, res);
                         }
                     }
                 }
@@ -306,8 +305,8 @@ void game_gen_area(Game *game, size_t start_y, size_t start_x, size_t end_y,
     }
 }
 
-bool game_tick(Game *game, double dt) {
-    UNUSED(game);
+bool world_tick(World *w, double dt) {
+    UNUSED(w);
     UNUSED(dt);
 
     bool updated = false;

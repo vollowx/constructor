@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "game.h"
+#include "world.h"
 
 #define SAVE_MAGIC 0x47414D45
 #define SAVE_VERSION 3
@@ -26,7 +26,7 @@ typedef struct {
 
 typedef struct {
     SaveHeader header;
-    Game *game;
+    World *world;
 } Save;
 
 typedef struct {

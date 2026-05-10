@@ -27,13 +27,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ui/fcp.h"
 #include "core/log.h"
 #include "core/options.h"
+#include "ui/fcp.h"
 
-#define CONSTRUCTOR_VERSION_MAJOR 0
-#define CONSTRUCTOR_VERSION_MINOR 0
-#define CONSTRUCTOR_VERSION_PATCH 0
+#define CW_VERSION_MAJOR 0
+#define CW_VERSION_MINOR 0
+#define CW_VERSION_PATCH 0
 
 extern GameOptions current_options;
 extern Logs logs;

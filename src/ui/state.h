@@ -13,21 +13,21 @@
     X(OPTIONS, options)                                                        \
     X(ABOUT, about)
 
-typedef struct AppContext AppContext;
+typedef struct PrgContext PrgContext;
 
 typedef struct {
-    void (*init)(AppContext *ctx);
+    void (*init)(PrgContext *ctx);
     void (*frame)(double dt);
-    void (*resize)(AppContext *ctx);
-    void (*deinit)();
+    void (*resize)(PrgContext *ctx);
+    void (*deinit)(void);
 } Overlay;
 
 typedef struct {
-    void (*init)(AppContext *ctx);
-    void (*input)(AppContext *ctx);
+    void (*init)(PrgContext *ctx);
+    void (*input)(PrgContext *ctx);
     void (*frame)(double dt);
-    void (*resize)(AppContext *ctx);
-    void (*deinit)();
+    void (*resize)(PrgContext *ctx);
+    void (*deinit)(void);
 } Screen;
 
 typedef enum {
@@ -36,30 +36,30 @@ typedef enum {
 #undef X
         APP_STATE_QUIT,
     _app_state_count,
-} AppState;
+} PrgState;
 
-struct AppContext {
-    AppState cur_state;
-    AppState next_state;
+struct PrgContext {
+    PrgState cur_state;
+    PrgState next_state;
     Screen *cur_screen;
     size_t cur_slot;
     int ch;
 };
 
 #define X(name)                                                                \
-    void name##_init(AppContext *ctx);                                         \
+    void name##_init(PrgContext *ctx);                                         \
     void name##_frame(double dt);                                              \
-    void name##_resize(AppContext *ctx);                                       \
+    void name##_resize(PrgContext *ctx);                                       \
     void name##_deinit();                                                      \
     extern Overlay overlay_##name;
 OVERLAY_MAP(X)
 #undef X
 
 #define X(state, name)                                                         \
-    void name##_init(AppContext *ctx);                                         \
-    void name##_input(AppContext *ctx);                                        \
+    void name##_init(PrgContext *ctx);                                         \
+    void name##_input(PrgContext *ctx);                                        \
     void name##_frame(double dt);                                              \
-    void name##_resize(AppContext *ctx);                                       \
+    void name##_resize(PrgContext *ctx);                                       \
     void name##_deinit();                                                      \
     extern Screen screen_##name;
 SCREEN_MAP(X)

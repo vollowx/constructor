@@ -1,15 +1,15 @@
 #include <time.h>
 
-#include "ui/app_state.h"
-#include "ui/fcp.h"
 #include "core/log.h"
 #include "core/options.h"
+#include "ui/fcp.h"
+#include "ui/state.h"
 
-#define FPS 60
+#define CW_FPS 60
 
 int main(int argc, char *argv[]) {
-    AppContext ctx = {
-        .cur_state = (AppState)-1,
+    PrgContext ctx = {
+        .cur_state = (PrgState)-1,
         .next_state = APP_STATE_MAIN_MENU,
         .cur_slot = 0,
     };
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
 
         doupdate();
 
-        napms(1000 / FPS);
+        napms(1000 / CW_FPS);
     }
 
     if (ctx.cur_screen)

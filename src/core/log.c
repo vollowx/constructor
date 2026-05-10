@@ -22,7 +22,7 @@ void log_message(LogLevel level, const char *fmt, ...) {
     da_append(&logs, log);
 }
 
-void free_logs() {
+void free_logs(void) {
     da_free(logs);
     logs.count = 0;
     logs.capacity = 0;

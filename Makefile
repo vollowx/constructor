@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall -Wextra -Wpedantic -Wno-unused-parameter -Isrc -Ithirdparty
 LDFLAGS=-lncurses -lmenu
 
-TARGET=build/constructor
+TARGET=build/charwild
 
 SRC=$(shell find src -name '*.c') thirdparty/simplexnoise1234.c
 OBJ=$(patsubst %.c,build/%.o,$(SRC))

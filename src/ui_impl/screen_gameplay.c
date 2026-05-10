@@ -1,7 +1,7 @@
-#include "ui/app_state.h"
-#include "ui/fcp.h"
 #include "core/log.h"
 #include "core/save.h"
+#include "ui/fcp.h"
+#include "ui/state.h"
 
 typedef struct {
     char symbol;
@@ -24,17 +24,17 @@ static CellVisualDef CELL_VISUAL_DB[] = {
 // clang-format on
 
 WINDOW *g_win = NULL;
-Game current_game = {0};
+World current_world = {0};
 Save current_save = {0};
 
 bool g_is_first_run = true;
 bool g_need_redraw = true;
 
-void gameplay_init(AppContext *ctx) {
+void gameplay_init(PrgContext *ctx) {
     info("[model] major = gameplay");
 
     if (g_is_first_run) {
-        current_save.game = &current_game;
+        current_save.world = &current_world;
         g_is_first_run = false;
 
         for (int i = 0; i < _elevation_count; ++i) {
@@ -59,79 +59,79 @@ void gameplay_deinit() {
         delwin(g_win);
         g_win = NULL;
     }
-    free_game(current_save.game);
+    free_world(current_save.world);
 
     g_need_redraw = true;
 }
 
-void gameplay_input(AppContext *ctx) {
-    Entity *p = current_save.game->player;
+void gameplay_input(PrgContext *ctx) {
+    Entity *p = current_save.world->player;
     if (!p)
         return;
 
     switch (ctx->ch) {
     case KEY_UP:
         // TASK(20260227-142821): Redesign player movement, consider add into
-        // game_tick and add velocity
+        // world_tick and add velocity
     case 'k':
         g_need_redraw =
-            entity_move(current_game.player, current_game.map, 0, -1);
+            entity_move(current_world.player, current_world.map, 0, -1);
         break;
     case KEY_DOWN:
     case 'j':
         g_need_redraw =
-            entity_move(current_game.player, current_game.map, 0, 1);
+            entity_move(current_world.player, current_world.map, 0, 1);
         break;
     case KEY_LEFT:
     case 'h':
         g_need_redraw =
-            entity_move(current_game.player, current_game.map, -1, 0);
+            entity_move(current_world.player, current_world.map, -1, 0);
         break;
     case KEY_RIGHT:
     case 'l':
         g_need_redraw =
-            entity_move(current_game.player, current_game.map, 1, 0);
+            entity_move(current_world.player, current_world.map, 1, 0);
         break;
         // TASK(20260226-155803): Add object related functions
     case 'K':
-        current_game.map
-            ->cells[current_game.player->y - 1][current_game.player->x]
+        current_world.map
+            ->cells[current_world.player->y - 1][current_world.player->x]
             .object_id = 0;
         g_need_redraw = true;
         break;
     case 'J':
-        current_game.map
-            ->cells[current_game.player->y + 1][current_game.player->x]
+        current_world.map
+            ->cells[current_world.player->y + 1][current_world.player->x]
             .object_id = 0;
         g_need_redraw = true;
         break;
     case 'H':
-        current_game.map
-            ->cells[current_game.player->y][current_game.player->x - 1]
+        current_world.map
+            ->cells[current_world.player->y][current_world.player->x - 1]
             .object_id = 0;
         g_need_redraw = true;
         break;
     case 'L':
-        current_game.map
-            ->cells[current_game.player->y][current_game.player->x + 1]
+        current_world.map
+            ->cells[current_world.player->y][current_world.player->x + 1]
             .object_id = 0;
         g_need_redraw = true;
         break;
     case '':
-        g_need_redraw = entity_place_object(current_game.player,
-                                            current_game.map, 10000, 0, -1);
+        g_need_redraw = entity_place_object(current_world.player,
+                                            current_world.map, 10000, 0, -1);
         break;
     case 10: // Vim not inputting ^J somehow
-        g_need_redraw = entity_place_object(current_game.player,
-                                            current_game.map, 10000, 0, 1);
+        g_need_redraw = entity_place_object(current_world.player,
+                                            current_world.map, 10000, 0, 1);
         break;
     case '':
-        g_need_redraw = entity_place_object(current_game.player,
-                                            current_game.map, 10000, -1, 0);
+        g_need_redraw = entity_place_object(current_world.player,
+                                            current_world.map, 10000, -1, 0);
         break;
     case '':
-        g_need_redraw = entity_place_object(current_game.player,
-                                            current_game.map, 10000, 1, 0);
+        g_need_redraw = entity_place_object(current_world.player,
+                                            current_world.map, 10000, 1, 0);
         break;
     case 'q':
         ctx->next_state = APP_STATE_SAVES;
@@ -140,7 +140,7 @@ void gameplay_input(AppContext *ctx) {
 }
 
 void gameplay_frame(double dt) {
-    if (!g_win || !current_save.game)
+    if (!g_win || !current_save.world)
         return;
 
     static double tick_accumulator = 0;
@@ -149,7 +149,7 @@ void gameplay_frame(double dt) {
     tick_accumulator += dt;
     while (tick_accumulator >= tick_rate) {
         // game_tick should be called 20 times a sec
-        if (game_tick(&current_game, tick_rate)) {
+        if (world_tick(&current_world, tick_rate)) {
             g_need_redraw = true;
         }
         tick_accumulator -= tick_rate;
@@ -158,8 +158,8 @@ void gameplay_frame(double dt) {
     if (!g_need_redraw)
         return;
 
-    Entity *p = current_save.game->player;
-    Map *map = current_save.game->map;
+    Entity *p = current_save.world->player;
+    Map *map = current_save.world->map;
 
     static int redraw_count = 0;
     static int fcp_get_calls = 0;
@@ -259,7 +259,7 @@ void gameplay_frame(double dt) {
     mvwprintw(g_win, 0, 0, "cell: { elevation: %d }",
               map->cells[p->y][p->x].elevation);
     mvwprintw(g_win, 1, 0, "player: { x: %zu, y: %zu }", p->x, p->y);
-    mvwprintw(g_win, 2, 0, "entities: %zu", current_save.game->entities.count);
+    mvwprintw(g_win, 2, 0, "entities: %zu", current_save.world->entities.count);
     mvwprintw(g_win, 3, 0, "redraws: %d", ++redraw_count);
     mvwprintw(g_win, 4, 0, "fcp_get calls: %d / %d",
               fcp_get_calls_in_one_render, fcp_get_calls);
@@ -271,7 +271,7 @@ void gameplay_frame(double dt) {
     g_need_redraw = false;
 }
 
-void gameplay_resize(AppContext *ctx) {
+void gameplay_resize(PrgContext *ctx) {
     if (g_win) {
         wresize(g_win, LINES, COLS);
         mvwin(g_win, 0, 0);

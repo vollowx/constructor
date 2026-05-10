@@ -1,10 +1,10 @@
 #include <menu.h>
 
-#include "ui/app_state.h"
-#include "ui/fcp.h"
 #include "core/helpers.h"
 #include "core/log.h"
 #include "core/options.h"
+#include "ui/fcp.h"
+#include "ui/state.h"
 
 #define OPTIONS_HEIGHT 32
 #define OPTIONS_WIDTH 56
@@ -27,7 +27,7 @@ void format_menu_item(char *dest, size_t size, const char *label,
              (total_width - label_width), value);
 }
 
-void rebuild_options_menu() {
+void rebuild_options_menu(void) {
     int current_idx = 0;
 
     if (o_menu) {
@@ -93,7 +93,7 @@ void rebuild_options_menu() {
     post_menu(o_menu);
 }
 
-void options_init(AppContext *ctx) {
+void options_init(PrgContext *ctx) {
     info("[model] major = options");
 
     o_win = newwin(OPTIONS_HEIGHT, OPTIONS_WIDTH, (LINES - OPTIONS_HEIGHT) / 2,
@@ -102,13 +102,13 @@ void options_init(AppContext *ctx) {
     rebuild_options_menu();
 }
 
-void options_deinit() {
+void options_deinit(void) {
     werase(o_win);
     wnoutrefresh(o_win);
     free_menu_ctx(o_win, o_menu, o_items, OPTIONS_HEIGHT - 4, false);
 }
 
-void options_input(AppContext *ctx) {
+void options_input(PrgContext *ctx) {
     switch (ctx->ch) {
     case KEY_DOWN:
     case 'j':
@@ -150,7 +150,7 @@ void options_frame(double dt) {
     wnoutrefresh(o_win);
 }
 
-void options_resize(AppContext *ctx) {
+void options_resize(PrgContext *ctx) {
     if (o_win)
         mvwin(o_win, (LINES - OPTIONS_HEIGHT) / 2, (COLS - OPTIONS_WIDTH) / 2);
 }

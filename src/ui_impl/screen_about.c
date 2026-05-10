@@ -1,13 +1,13 @@
-#include "ui/app_state.h"
 #include "core/helpers.h"
 #include "core/log.h"
+#include "ui/state.h"
 
 #define ABOUT_HEIGHT 9
 #define ABOUT_WIDTH 60
 
 WINDOW *a_win;
 
-void about_init(AppContext *ctx) {
+void about_init(PrgContext *ctx) {
     info("[model] major = about");
 
     a_win = newwin(ABOUT_HEIGHT, ABOUT_WIDTH, (LINES - ABOUT_HEIGHT) / 2,
@@ -16,7 +16,7 @@ void about_init(AppContext *ctx) {
     keypad(a_win, TRUE);
 }
 
-void about_deinit() {
+void about_deinit(void) {
     if (!a_win)
         return;
 
@@ -26,7 +26,7 @@ void about_deinit() {
     a_win = NULL;
 }
 
-void about_input(AppContext *ctx) {
+void about_input(PrgContext *ctx) {
     switch (ctx->ch) {
     case 'q':
         ctx->next_state = APP_STATE_MAIN_MENU;
@@ -41,15 +41,15 @@ void about_frame(double dt) {
         return;
 
     draw_win_frame(a_win, "About", COLOR_BLUE);
-    mvwprintw(a_win, 2, 4, "Constructor v%d.%d.%d", CONSTRUCTOR_VERSION_MAJOR,
-              CONSTRUCTOR_VERSION_MINOR, CONSTRUCTOR_VERSION_PATCH);
+    mvwprintw(a_win, 2, 4, "charwild v%d.%d.%d", CW_VERSION_MAJOR,
+              CW_VERSION_MINOR, CW_VERSION_PATCH);
     mvwprintw(a_win, 3, 4, "    developed by Lucas X. Zhao");
     mvwprintw(a_win, 4, 4, "    licensed under Apache-2.0");
-    mvwprintw(a_win, 6, 4, "Constructor is a survival sandbox game in TUI.");
+    mvwprintw(a_win, 6, 4, "charwild is a survival sandbox game in TUI.");
     wnoutrefresh(a_win);
 }
 
-void about_resize(AppContext *ctx) {
+void about_resize(PrgContext *ctx) {
     if (!a_win)
         return;
 

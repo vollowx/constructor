@@ -1,13 +1,13 @@
-#include "ui/app_state.h"
-#include "ui/fcp.h"
 #include "core/helpers.h"
 #include "core/log.h"
 #include "core/options.h"
+#include "ui/fcp.h"
+#include "ui/state.h"
 
 WINDOW *l_win = NULL;
 static short log_cp[3];
 
-void log_init(AppContext *ctx) {
+void log_init(PrgContext *ctx) {
     info("[model] minor += log");
 
     log_cp[LOG_INFO] = fcp_get(COLOR_BLUE, -1);
@@ -18,7 +18,7 @@ void log_init(AppContext *ctx) {
     l_win = newwin(height, COLS, LINES - height, 0);
 }
 
-void log_deinit() {
+void log_deinit(void) {
     werase(l_win);
     wnoutrefresh(l_win);
     if (l_win) {
@@ -67,7 +67,7 @@ void log_frame(double dt) {
     wnoutrefresh(l_win);
 }
 
-void log_resize(AppContext *ctx) {
+void log_resize(PrgContext *ctx) {
     if (!l_win)
         return;
 

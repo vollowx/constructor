@@ -4,7 +4,6 @@
 #include <string.h>
 #include <time.h>
 
-#include "core/game.h"
 #include "core/helpers.h"
 #include "core/log.h"
 #include "core/save.h"
@@ -48,7 +47,7 @@ SaveResult save_load(Save *self, int slot) {
     char path[128];
     get_path(slot, path, sizeof(path));
 
-    info("[save] Loading game from %s...", path);
+    info("[save] Loading world from %s...", path);
 
     FILE *fp = fopen(path, "rb");
     if (!fp) {
@@ -76,7 +75,7 @@ SaveResult save_load(Save *self, int slot) {
 
     info("[save] Header valid with player: %s", self->header.player_name);
 
-    if (map_load(&self->game->map, fp) != SAVE_OK) {
+    if (map_load(&self->world->map, fp) != SAVE_OK) {
         error("[save] Failed to load map");
         fclose(fp);
         return SAVE_ERR_READ;
@@ -91,10 +90,10 @@ SaveResult save_load(Save *self, int slot) {
 
     info("[save] Loading %llu entities...", (unsigned long long)entity_count);
 
-    // NOTE: You must ensure self->game->entities is freed/cleared before this
-    // point if you are loading a game while already playing!
-    da_reserve(&self->game->entities, entity_count);
-    self->game->player = NULL;
+    // NOTE: You must ensure self->world->entities is freed/cleared before this
+    // point if you are loading a world while already playing!
+    da_reserve(&self->world->entities, entity_count);
+    self->world->player = NULL;
 
     for (size_t i = 0; i < entity_count; ++i) {
         Entity *ent = malloc(sizeof(Entity));
@@ -163,17 +162,17 @@ SaveResult save_load(Save *self, int slot) {
             ent->inventory.items = NULL;
         }
 
-        da_append(&self->game->entities, ent);
+        da_append(&self->world->entities, ent);
 
-        if (ent->x < self->game->map->w && ent->y < self->game->map->h) {
-            self->game->map->cells[ent->y][ent->x].entity = ent;
+        if (ent->x < self->world->map->w && ent->y < self->world->map->h) {
+            self->world->map->cells[ent->y][ent->x].entity = ent;
         } else {
             error("[save] Entity '%s' is out of map bounds (%d, %d)", ent->name,
                   ent->x, ent->y);
         }
 
         if (ent->def->type == ENTITY_PLAYER) {
-            self->game->player = ent;
+            self->world->player = ent;
         }
     }
 
@@ -236,17 +235,17 @@ static SaveResult entity_save(const Entity *ent, FILE *fp) {
     return SAVE_OK;
 }
 
-static SaveResult game_save(const Game *game, FILE *fp) {
-    if (map_save(game->map, fp) != SAVE_OK) {
+static SaveResult world_save(const World *w, FILE *fp) {
+    if (map_save(w->map, fp) != SAVE_OK) {
         error("[save] Failed to write map");
         return SAVE_ERR_WRITE;
     }
 
-    size_t count = game->entities.count;
+    size_t count = w->entities.count;
     if (fwrite(&count, sizeof(size_t), 1, fp) != 1)
         return SAVE_ERR_WRITE;
 
-    da_foreach(Entity *, it, &game->entities) {
+    da_foreach(Entity *, it, &w->entities) {
         if (entity_save(*it, fp) != SAVE_OK) {
             error("[save] Failed to write entity '%s'", (*it)->name);
             return SAVE_ERR_WRITE;
@@ -273,7 +272,7 @@ SaveResult save_save(const Save *self, int slot) {
         return SAVE_ERR_WRITE;
     }
 
-    SaveResult res = game_save(self->game, fp);
+    SaveResult res = world_save(self->world, fp);
 
     fclose(fp);
     if (res == SAVE_OK)
