@@ -1,6 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -Ithirdparty
-LIBS=-lncurses -lmenu
+LDFLAGS=
+LDLIBS=-lncurses -lmenu
 
 TARGET=constructor
 
@@ -12,13 +13,17 @@ SRC=main.c fcp.c game.c log.c models.c options.c save.c \
     major_options.c \
     major_about.c \
     thirdparty/simplexnoise1234.c
+OBJ=$(SRC:.c=.o)
+
+.PHONY: all clean
 
 all: $(TARGET)
 
-$(TARGET): $(SRC)
-	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) $(LIBS)
+$(TARGET): $(OBJ)
+	$(CC) $(LDFLAGS) $(LDLIBS) $< -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(TARGET)
-
-.PHONY: clean
