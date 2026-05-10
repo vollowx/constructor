@@ -1,7 +1,7 @@
 image: archlinux
 packages:
 sources:
-    - https://git.sr.ht/~lucaz/constructor
+    - https://git.sr.ht/~lucaz/charwild
 triggers:
     - action: email
       condition: failure
