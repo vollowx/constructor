@@ -4,8 +4,8 @@
 
 #include "fcp.h"
 #include "helpers.h"
+#include "info.h"
 #include "log.h"
-#include "models.h"
 #include "save.h"
 
 // menu height = 3, padding = 1 * 2, border = 1 * 2
@@ -20,7 +20,7 @@ static WINDOW *s_win = NULL;
 static WINDOW *s_pre = NULL;
 static SavePreview previews[3];
 
-void rebuild_saves_menu() {
+void rebuild_saves_menu(GameInfo *info) {
   if (s_menu) {
     unpost_menu(s_menu);
     free_menu(s_menu);
@@ -53,12 +53,12 @@ void rebuild_saves_menu() {
   set_menu_mark(s_menu, " > ");
   set_menu_fore(s_menu,
                 COLOR_PAIR(fcp_get(COLOR_BLUE, -1)) | A_BOLD | A_REVERSE);
-  set_current_item(s_menu, s_items[current_slot]);
+  set_current_item(s_menu, s_items[info->cur_slot]);
 
   post_menu(s_menu);
 }
 
-void saves_init() {
+void saves_init(GameInfo *info) {
   info("[model] major = saves");
 
   //                          gap
@@ -71,7 +71,7 @@ void saves_init() {
       newwin(PREVIEW_HEIGHT, PREVIEW_WIDTH, start_y, start_x + SAVES_WIDTH + 1);
 
   keypad(s_win, TRUE);
-  rebuild_saves_menu();
+  rebuild_saves_menu(info);
 }
 
 void saves_deinit() {
@@ -88,15 +88,15 @@ void saves_deinit() {
   }
 }
 
-void saves_input(int ch) {
+void saves_input(GameInfo *info) {
   int slot = item_index(current_item(s_menu));
 
   ITEM *cur = current_item(s_menu);
   if (cur) {
-    current_slot = item_index(cur);
+    info->cur_slot = item_index(cur);
   }
 
-  switch (ch) {
+  switch (info->ch) {
   case KEY_DOWN:
   case 'j':
     menu_driver(s_menu, REQ_DOWN_ITEM);
@@ -106,13 +106,13 @@ void saves_input(int ch) {
     menu_driver(s_menu, REQ_UP_ITEM);
     break;
   case 'q':
-    next_state = STATE_MAIN_MENU;
+    info->next_state = STATE_MAIN_MENU;
     break;
 
   case 10:
   case 'o':
     if (previews[slot].exists) {
-      next_state = STATE_GAMEPLAY;
+      info->next_state = STATE_GAMEPLAY;
     } else {
       Game game = {0};
       game_init(&game);
@@ -123,7 +123,7 @@ void saves_input(int ch) {
       save_save(&save, slot);
       free_game(&game);
 
-      rebuild_saves_menu();
+      rebuild_saves_menu(info);
     }
 
     break;
@@ -165,7 +165,7 @@ void saves_input(int ch) {
       free_game(save.game);
     }
 
-    rebuild_saves_menu();
+    rebuild_saves_menu(info);
     break;
   }
 }
@@ -204,7 +204,7 @@ void saves_frame(double dt) {
   wnoutrefresh(s_pre);
 }
 
-void saves_resize() {
+void saves_resize(GameInfo *info) {
   if (!s_win || !s_pre)
     return;
 
@@ -215,5 +215,5 @@ void saves_resize() {
   mvwin(s_win, start_y, start_x);
   mvwin(s_pre, start_y, start_x + SAVES_WIDTH + 1);
 
-  rebuild_saves_menu();
+  rebuild_saves_menu(info);
 }

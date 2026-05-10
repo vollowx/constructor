@@ -29,7 +29,6 @@
 
 #include "fcp.h"
 #include "log.h"
-#include "models.h"
 #include "options.h"
 
 #define CONSTRUCTOR_VERSION_MAJOR 0
@@ -37,9 +36,6 @@
 #define CONSTRUCTOR_VERSION_PATCH 0
 
 extern GameOptions current_options;
-extern int current_slot;
-extern GameState current_state;
-extern GameState next_state;
 extern Logs logs;
 
 #define UNUSED (void)

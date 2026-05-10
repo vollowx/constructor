@@ -5,8 +5,8 @@
 
 #include "fcp.h"
 #include "helpers.h"
+#include "info.h"
 #include "log.h"
-#include "models.h"
 #include "options.h"
 
 #define OPTIONS_HEIGHT 32
@@ -96,7 +96,7 @@ void rebuild_options_menu() {
   post_menu(o_menu);
 }
 
-void options_init() {
+void options_init(GameInfo *info) {
   info("[model] major = options");
 
   o_win = newwin(OPTIONS_HEIGHT, OPTIONS_WIDTH, (LINES - OPTIONS_HEIGHT) / 2,
@@ -111,8 +111,8 @@ void options_deinit() {
   free_menu_ctx(o_win, o_menu, o_items, OPTIONS_HEIGHT - 4, false);
 }
 
-void options_input(int ch) {
-  switch (ch) {
+void options_input(GameInfo *info) {
+  switch (info->ch) {
   case KEY_DOWN:
   case 'j':
     menu_driver(o_menu, REQ_DOWN_ITEM);
@@ -123,7 +123,7 @@ void options_input(int ch) {
     break;
   case 'q':
     options_load();
-    next_state = STATE_MAIN_MENU;
+    info->next_state = STATE_MAIN_MENU;
     break;
   case 10: {
     ITEM *cur = current_item(o_menu);
@@ -137,10 +137,10 @@ void options_input(int ch) {
       rebuild_options_menu();
     } else if (strcmp(name, "Save") == 0) {
       options_save();
-      next_state = STATE_MAIN_MENU;
+      info->next_state = STATE_MAIN_MENU;
     } else if (strcmp(name, "Cancel") == 0) {
       options_load();
-      next_state = STATE_MAIN_MENU;
+      info->next_state = STATE_MAIN_MENU;
     }
     break;
   }
@@ -153,7 +153,7 @@ void options_frame(double dt) {
   wnoutrefresh(o_win);
 }
 
-void options_resize() {
+void options_resize(GameInfo *info) {
   if (o_win)
     mvwin(o_win, (LINES - OPTIONS_HEIGHT) / 2, (COLS - OPTIONS_WIDTH) / 2);
 }

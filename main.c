@@ -1,15 +1,12 @@
 #include <time.h>
 
 #include "fcp.h"
+#include "info.h"
 #include "log.h"
-#include "models.h"
 #include "options.h"
 
 #define FPS 60
 
-int current_slot = 0;
-GameState next_state = STATE_MAIN_MENU;
-GameState current_state = (GameState)-1;
 // Current primary model
 Model *pm = NULL;
 
@@ -28,6 +25,12 @@ void update_activity_ptr(GameState state) {
 }
 
 int main() {
+  GameInfo info = {
+      .cur_state = (GameState)-1,
+      .next_state = STATE_MAIN_MENU,
+      .cur_slot = 0,
+  };
+
   initscr();
   cbreak();
   noecho();
@@ -50,43 +53,41 @@ int main() {
   struct timespec last_frame, current_frame;
   clock_gettime(CLOCK_MONOTONIC, &last_frame);
 
-  int ch;
-
-#define X(name) name##_init();
+#define X(name) name##_init(&info);
   AM_MAP(X)
 #undef X
 
-  while (next_state != STATE_QUIT) {
+  while (info.next_state != STATE_QUIT) {
     clock_gettime(CLOCK_MONOTONIC, &current_frame);
     double dt = (current_frame.tv_sec - last_frame.tv_sec) +
                 (current_frame.tv_nsec - last_frame.tv_nsec) / 1e9;
     last_frame = current_frame;
 
-    if (next_state != current_state) {
+    if (info.next_state != info.cur_state) {
       if (pm) {
         pm->deinit();
       }
 
-      current_state = next_state;
-      update_activity_ptr(current_state);
+      info.cur_state = info.next_state;
+      update_activity_ptr(info.cur_state);
 
-      pm->init();
+      pm->init(&info);
     }
 
-    ch = getch();
-    if (ch == KEY_RESIZE) {
+    info.ch = getch();
+    if (info.ch == KEY_RESIZE) {
       erase();
 
       if (pm)
-        pm->resize();
-#define X(name) name##_resize();
+        pm->resize(&info);
+#define X(name) name##_resize(&info);
       AM_MAP(X)
 #undef X
 
       refresh();
     } else {
       if (pm)
-        pm->input(ch);
+        pm->input(&info);
     }
 
     if (pm)

@@ -1,0 +1,18 @@
+image: archlinux
+packages:
+sources:
+    - https://git.sr.ht/~lucaz/constructor
+triggers:
+    - action: email
+      condition: failure
+      to: "<vollowx@outlook.com>"
+tasks:
+    - build: |
+             cd constructor
+             make -k
+submitter:
+    git.sr.ht:
+        enabled: true
+        allow-refs:
+            - refs/heads/main
+            - "refs/tags/*"

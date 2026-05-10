@@ -1,7 +1,6 @@
 #include "fcp.h"
-#include "helpers.h"
+#include "info.h"
 #include "log.h"
-#include "models.h"
 #include "save.h"
 
 typedef struct {
@@ -31,7 +30,7 @@ Save current_save = {0};
 bool g_is_first_run = true;
 bool g_need_redraw = true;
 
-void gameplay_init() {
+void gameplay_init(GameInfo *info) {
   info("[model] major = gameplay");
 
   if (g_is_first_run) {
@@ -44,8 +43,8 @@ void gameplay_init() {
     }
   }
 
-  if (save_load(&current_save, current_slot) != SAVE_OK) {
-    next_state = STATE_MAIN_MENU;
+  if (save_load(&current_save, info->cur_slot) != SAVE_OK) {
+    info->next_state = STATE_MAIN_MENU;
     return;
   }
 
@@ -65,12 +64,12 @@ void gameplay_deinit() {
   g_need_redraw = true;
 }
 
-void gameplay_input(int ch) {
+void gameplay_input(GameInfo *info) {
   Entity *p = current_save.game->player;
   if (!p)
     return;
 
-  switch (ch) {
+  switch (info->ch) {
   case KEY_UP:
     // TASK(20260227-142821): Redesign player movement, consider add into
     // game_tick and add velocity
@@ -127,7 +126,7 @@ void gameplay_input(int ch) {
         entity_place_object(current_game.player, current_game.map, 10000, 1, 0);
     break;
   case 'q':
-    next_state = STATE_SAVES;
+    info->next_state = STATE_SAVES;
     break;
   }
 }
@@ -263,7 +262,7 @@ void gameplay_frame(double dt) {
   g_need_redraw = false;
 }
 
-void gameplay_resize() {
+void gameplay_resize(GameInfo *info) {
   if (g_win) {
     wresize(g_win, LINES, COLS);
     mvwin(g_win, 0, 0);

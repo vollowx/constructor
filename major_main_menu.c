@@ -4,8 +4,8 @@
 
 #include "fcp.h"
 #include "helpers.h"
+#include "info.h"
 #include "log.h"
-#include "models.h"
 
 #define MAIN_MENU_HEIGHT 8
 #define MAIN_MENU_WIDTH 36
@@ -15,7 +15,7 @@ ITEM **m_items;
 MENU *m_menu;
 WINDOW *m_win;
 
-void main_menu_init() {
+void main_menu_init(GameInfo *info) {
   info("[model] major = main_menu");
 
   char *labels[] = {"Start Game", "Options", "About",
@@ -45,8 +45,8 @@ void main_menu_deinit() {
   free_menu_ctx(m_win, m_menu, m_items, MAIN_MENU_N_ITEMS, false);
 }
 
-void main_menu_input(int ch) {
-  switch (ch) {
+void main_menu_input(GameInfo *info) {
+  switch (info->ch) {
   case KEY_DOWN:
   case 'j':
     menu_driver(m_menu, REQ_DOWN_ITEM);
@@ -56,22 +56,22 @@ void main_menu_input(int ch) {
     menu_driver(m_menu, REQ_UP_ITEM);
     break;
   case 'q':
-    next_state = STATE_QUIT;
+    info->next_state = STATE_QUIT;
     break;
   case 10: {
     int index = item_index(current_item(m_menu));
     switch (index) {
     case 0:
-      next_state = STATE_SAVES;
+      info->next_state = STATE_SAVES;
       break;
     case 1:
-      next_state = STATE_OPTIONS;
+      info->next_state = STATE_OPTIONS;
       break;
     case 2:
-      next_state = STATE_ABOUT;
+      info->next_state = STATE_ABOUT;
       break;
     case 3:
-      next_state = STATE_QUIT;
+      info->next_state = STATE_QUIT;
       break;
     }
     break;
@@ -85,6 +85,6 @@ void main_menu_frame(double dt) {
   wnoutrefresh(m_win);
 }
 
-void main_menu_resize() {
+void main_menu_resize(GameInfo *info) {
   mvwin(m_win, (LINES - MAIN_MENU_HEIGHT) / 2, (COLS - MAIN_MENU_WIDTH) / 2);
 }

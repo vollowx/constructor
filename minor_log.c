@@ -3,14 +3,14 @@
 
 #include "fcp.h"
 #include "helpers.h"
+#include "info.h"
 #include "log.h"
-#include "models.h"
 #include "options.h"
 
 WINDOW *l_win = NULL;
 static short log_cp[3];
 
-void log_init() {
+void log_init(GameInfo *info) {
   info("[model] minor += log");
 
   log_cp[LOG_INFO] = fcp_get(COLOR_BLUE, -1);
@@ -21,8 +21,7 @@ void log_init() {
   l_win = newwin(height, COLS, LINES - height, 0);
 }
 
-void log_input(int ch) {
-  UNUSED(ch);
+void log_input(GameInfo *info) {
   assert(0 && "Unreachable");
 }
 
@@ -75,7 +74,7 @@ void log_frame(double dt) {
   wnoutrefresh(l_win);
 }
 
-void log_resize() {
+void log_resize(GameInfo *info) {
   if (!l_win)
     return;
 

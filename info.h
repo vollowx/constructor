@@ -1,15 +1,7 @@
-#ifndef MODELS_H
-#define MODELS_H
+#ifndef INFO_H
+#define INFO_H
 
 #include <ncurses.h>
-
-typedef struct {
-  void (*init)();
-  void (*input)(int ch);
-  void (*frame)(double dt);
-  void (*resize)();
-  void (*deinit)();
-} Model;
 
 #define AM_MAP(X) X(log)
 
@@ -21,31 +13,6 @@ typedef struct {
   X(OPTIONS, options)                                                          \
   X(ABOUT, about)
 
-// Implementation filename e.g.
-// am_log.c   - Always-on model
-// pm_saves.c - Primary model
-
-// TODO: Consider remove ..._input() functions for always-on models
-#define X(name)                                                                \
-  void name##_init();                                                          \
-  void name##_input(int ch);                                                   \
-  void name##_frame(double dt);                                                \
-  void name##_resize();                                                        \
-  void name##_deinit();                                                        \
-  extern Model model_##name;
-AM_MAP(X)
-#undef X
-
-#define X(state, name)                                                         \
-  void name##_init();                                                          \
-  void name##_input(int ch);                                                   \
-  void name##_frame(double dt);                                                \
-  void name##_resize();                                                        \
-  void name##_deinit();                                                        \
-  extern Model model_##name;
-PM_MAP(X)
-#undef X
-
 typedef enum {
 #define X(state, name) STATE_##state,
   PM_MAP(X)
@@ -54,4 +21,44 @@ typedef enum {
   STATE_QUIT
 } GameState;
 
-#endif
+typedef struct {
+  GameState cur_state;
+  GameState next_state;
+  size_t cur_slot;
+  int ch;
+} GameInfo;
+
+typedef struct {
+  void (*init)(GameInfo *info);
+  void (*input)(GameInfo *info);
+  void (*frame)(double dt);
+  void (*resize)(GameInfo *info);
+  void (*deinit)();
+} Model;
+
+// Implementation filename e.g.
+// minor_log.c   - Always-on model
+// major_saves.c - Primary model
+
+// TODO: Consider remove ..._input() functions for always-on models
+#define X(name)                                                                \
+  void name##_init(GameInfo *info);                                            \
+  void name##_input(GameInfo *info);                                           \
+  void name##_frame(double dt);                                                \
+  void name##_resize(GameInfo *info);                                          \
+  void name##_deinit();                                                        \
+  extern Model model_##name;
+AM_MAP(X)
+#undef X
+
+#define X(state, name)                                                         \
+  void name##_init(GameInfo *info);                                            \
+  void name##_input(GameInfo *info);                                           \
+  void name##_frame(double dt);                                                \
+  void name##_resize(GameInfo *info);                                          \
+  void name##_deinit();                                                        \
+  extern Model model_##name;
+PM_MAP(X)
+#undef X
+
+#endif // INFO_H

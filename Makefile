@@ -1,11 +1,11 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -Ithirdparty
+CFLAGS=-Wall -Wextra -Wno-unused-parameter -Ithirdparty
 LDFLAGS=
 LDLIBS=-lncurses -lmenu
 
 TARGET=constructor
 
-SRC=main.c fcp.c game.c log.c models.c options.c save.c \
+SRC=main.c fcp.c game.c log.c info.c options.c save.c \
     minor_log.c \
     major_main_menu.c \
     major_saves.c \
@@ -20,7 +20,7 @@ OBJ=$(SRC:.c=.o)
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $(LDFLAGS) $(LDLIBS) $< -o $@
+	$(CC) $(LDFLAGS) $(LDLIBS) $(OBJ) -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

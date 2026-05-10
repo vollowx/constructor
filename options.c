@@ -27,7 +27,7 @@ void options_load() {
   }
   fclose(f);
 
-  info("[options] loaded from %s", PATH_OPTIONS);
+  info("[options] options loaded from %s", PATH_OPTIONS);
 }
 
 void options_save() {
@@ -40,5 +40,5 @@ void options_save() {
   fprintf(f, "show_log=%d\n", (int)current_options.show_log);
   fclose(f);
 
-  info("[options] wrote to %s", PATH_OPTIONS);
+  info("[options] options wrote to %s", PATH_OPTIONS);
 }

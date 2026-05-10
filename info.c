@@ -1,4 +1,4 @@
-#include "models.h"
+#include "info.h"
 
 #define X(state, name)                                                         \
   Model model_##name = {name##_init, name##_input, name##_frame,               \
