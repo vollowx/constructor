@@ -11,20 +11,20 @@
 #define error(fmt, ...) log_message(LOG_ERROR, fmt, ##__VA_ARGS__)
 
 typedef enum {
-  LOG_INFO = 0,
-  LOG_WARNING,
-  LOG_ERROR,
+    LOG_INFO = 0,
+    LOG_WARNING,
+    LOG_ERROR,
 } LogLevel;
 
 typedef struct {
-  LogLevel level;
-  const char *msg;
+    LogLevel level;
+    const char *msg;
 } Log;
 
 typedef struct {
-  Log *items;
-  size_t capacity;
-  size_t count;
+    Log *items;
+    size_t capacity;
+    size_t count;
 } Logs;
 
 void log_message(LogLevel level, const char *fmt, ...);

@@ -4,9 +4,9 @@
 #include <stdbool.h>
 
 typedef struct {
-  int log_level;
-  bool save_log;
-  bool show_log;
+    int log_level;
+    bool save_log;
+    bool show_log;
 } GameOptions;
 
 void options_load();

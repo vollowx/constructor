@@ -41,38 +41,38 @@ extern Logs logs;
 #define UNUSED (void)
 
 #define draw_win_frame(win, title, color)                                      \
-  do {                                                                         \
-    wattron(win, COLOR_PAIR(fcp_get(color, -1)));                              \
-    box(win, 0, 0);                                                            \
-    wattron(win, A_BOLD);                                                      \
-    mvwprintw(win, 0, 3, " %s ", title);                                       \
-    wattroff(win, COLOR_PAIR(fcp_get(color, -1)) | A_BOLD);                    \
-  } while (0)
+    do {                                                                       \
+        wattron(win, COLOR_PAIR(fcp_get(color, -1)));                          \
+        box(win, 0, 0);                                                        \
+        wattron(win, A_BOLD);                                                  \
+        mvwprintw(win, 0, 3, " %s ", title);                                   \
+        wattroff(win, COLOR_PAIR(fcp_get(color, -1)) | A_BOLD);                \
+    } while (0)
 
 #define free_menu_ctx(win, menu, items, n_items, owns_labels)                  \
-  do {                                                                         \
-    if (menu) {                                                                \
-      unpost_menu(menu);                                                       \
-      WINDOW *sub = menu_sub(menu);                                            \
-      if (sub)                                                                 \
-        delwin(sub);                                                           \
-      free_menu(menu);                                                         \
-      menu = NULL;                                                             \
-    }                                                                          \
-    if (items) {                                                               \
-      for (int i = 0; i < n_items; i++) {                                      \
-        if (owns_labels)                                                       \
-          free((void *)item_name(items[i]));                                   \
-        free_item(items[i]);                                                   \
-      }                                                                        \
-      free(items);                                                             \
-      items = NULL;                                                            \
-    }                                                                          \
-    if (win) {                                                                 \
-      delwin(win);                                                             \
-      win = NULL;                                                              \
-    }                                                                          \
-  } while (0)
+    do {                                                                       \
+        if (menu) {                                                            \
+            unpost_menu(menu);                                                 \
+            WINDOW *sub = menu_sub(menu);                                      \
+            if (sub)                                                           \
+                delwin(sub);                                                   \
+            free_menu(menu);                                                   \
+            menu = NULL;                                                       \
+        }                                                                      \
+        if (items) {                                                           \
+            for (int i = 0; i < n_items; i++) {                                \
+                if (owns_labels)                                               \
+                    free((void *)item_name(items[i]));                         \
+                free_item(items[i]);                                           \
+            }                                                                  \
+            free(items);                                                       \
+            items = NULL;                                                      \
+        }                                                                      \
+        if (win) {                                                             \
+            delwin(win);                                                       \
+            win = NULL;                                                        \
+        }                                                                      \
+    } while (0)
 
 #define NOB_REALLOC realloc
 #define NOB_FREE free
@@ -81,55 +81,55 @@ extern Logs logs;
 #define NOB_DECLTYPE_CAST(x)
 
 #define nob_da_reserve(da, expected_capacity)                                  \
-  do {                                                                         \
-    if ((expected_capacity) > (da)->capacity) {                                \
-      if ((da)->capacity == 0) {                                               \
-        (da)->capacity = NOB_DA_INIT_CAP;                                      \
-      }                                                                        \
-      while ((expected_capacity) > (da)->capacity) {                           \
-        (da)->capacity *= 2;                                                   \
-      }                                                                        \
-      (da)->items = NOB_DECLTYPE_CAST((da)->items)                             \
-          NOB_REALLOC((da)->items, (da)->capacity * sizeof(*(da)->items));     \
-      NOB_ASSERT((da)->items != NULL && "Buy more RAM lol");                   \
-    }                                                                          \
-  } while (0)
+    do {                                                                       \
+        if ((expected_capacity) > (da)->capacity) {                            \
+            if ((da)->capacity == 0) {                                         \
+                (da)->capacity = NOB_DA_INIT_CAP;                              \
+            }                                                                  \
+            while ((expected_capacity) > (da)->capacity) {                     \
+                (da)->capacity *= 2;                                           \
+            }                                                                  \
+            (da)->items = NOB_DECLTYPE_CAST((da)->items) NOB_REALLOC(          \
+                (da)->items, (da)->capacity * sizeof(*(da)->items));           \
+            NOB_ASSERT((da)->items != NULL && "Buy more RAM lol");             \
+        }                                                                      \
+    } while (0)
 
 // Append an item to a dynamic array
 #define nob_da_append(da, item)                                                \
-  do {                                                                         \
-    nob_da_reserve((da), (da)->count + 1);                                     \
-    (da)->items[(da)->count++] = (item);                                       \
-  } while (0)
+    do {                                                                       \
+        nob_da_reserve((da), (da)->count + 1);                                 \
+        (da)->items[(da)->count++] = (item);                                   \
+    } while (0)
 
 #define nob_da_free(da) NOB_FREE((da).items)
 
 // Append several items to a dynamic array
 #define nob_da_append_many(da, new_items, new_items_count)                     \
-  do {                                                                         \
-    nob_da_reserve((da), (da)->count + (new_items_count));                     \
-    memcpy((da)->items + (da)->count, (new_items),                             \
-           (new_items_count) * sizeof(*(da)->items));                          \
-    (da)->count += (new_items_count);                                          \
-  } while (0)
+    do {                                                                       \
+        nob_da_reserve((da), (da)->count + (new_items_count));                 \
+        memcpy((da)->items + (da)->count, (new_items),                         \
+               (new_items_count) * sizeof(*(da)->items));                      \
+        (da)->count += (new_items_count);                                      \
+    } while (0)
 
 #define nob_da_resize(da, new_size)                                            \
-  do {                                                                         \
-    nob_da_reserve((da), new_size);                                            \
-    (da)->count = (new_size);                                                  \
-  } while (0)
+    do {                                                                       \
+        nob_da_reserve((da), new_size);                                        \
+        (da)->count = (new_size);                                              \
+    } while (0)
 
 #define nob_da_last(da)                                                        \
-  (da)->items[(NOB_ASSERT((da)->count > 0), (da)->count - 1)]
+    (da)->items[(NOB_ASSERT((da)->count > 0), (da)->count - 1)]
 #define nob_da_remove_unordered(da, i)                                         \
-  do {                                                                         \
-    size_t j = (i);                                                            \
-    NOB_ASSERT(j < (da)->count);                                               \
-    (da)->items[j] = (da)->items[--(da)->count];                               \
-  } while (0) use these
+    do {                                                                       \
+        size_t j = (i);                                                        \
+        NOB_ASSERT(j < (da)->count);                                           \
+        (da)->items[j] = (da)->items[--(da)->count];                           \
+    } while (0) use these
 
 #define nob_da_foreach(Type, it, da)                                           \
-  for (Type *it = (da)->items; it < (da)->items + (da)->count; ++it)
+    for (Type *it = (da)->items; it < (da)->items + (da)->count; ++it)
 
 #define da_append nob_da_append
 #define da_free nob_da_free

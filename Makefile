@@ -5,13 +5,13 @@ LDLIBS=-lncurses -lmenu
 
 TARGET=constructor
 
-SRC=main.c fcp.c game.c log.c info.c options.c save.c \
-    minor_log.c \
-    major_main_menu.c \
-    major_saves.c \
-    major_gameplay.c \
-    major_options.c \
-    major_about.c \
+SRC=main.c fcp.c game.c log.c app_state.c options.c save.c \
+    overlay_log.c \
+    screen_main_menu.c \
+    screen_saves.c \
+    screen_gameplay.c \
+    screen_options.c \
+    screen_about.c \
     thirdparty/simplexnoise1234.c
 OBJ=$(SRC:.c=.o)
 

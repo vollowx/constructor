@@ -15,109 +15,109 @@
 // 5. game
 
 typedef enum {
-  ELEV_NONE = 0,
-  ELEV_DEEP_WATER,
-  ELEV_WATER,
-  ELEV_GROUND,
-  ELEV_HILL,
-  ELEV_MOUNTAIN,
-  _elevation_count,
+    ELEV_NONE = 0,
+    ELEV_DEEP_WATER,
+    ELEV_WATER,
+    ELEV_GROUND,
+    ELEV_HILL,
+    ELEV_MOUNTAIN,
+    _elevation_count,
 } Elevation;
 
 typedef enum {
-  ITEM_RESOURCE,   // Ore, wood
-  ITEM_PLACEABLE,  // Seeds, furniture
-  ITEM_CONSUMABLE, // Food, potions
-  ITEM_EQUIPMENT,  // Tools, armor
+    ITEM_RESOURCE,   // Ore, wood
+    ITEM_PLACEABLE,  // Seeds, furniture
+    ITEM_CONSUMABLE, // Food, potions
+    ITEM_EQUIPMENT,  // Tools, armor
 } ItemType;
 
 typedef enum {
-  ENTITY_PLAYER,
-  ENTITY_NPC,
-  ENTITY_ENEMY,
-  ENTITY_ANIMAL,
-  ENTITY_ITEM,
+    ENTITY_PLAYER,
+    ENTITY_NPC,
+    ENTITY_ENEMY,
+    ENTITY_ANIMAL,
+    ENTITY_ITEM,
 } EntityType;
 
 typedef struct {
-  uint16_t id;
-  ItemType type;
-  char name[32];
-  int max_stack;
+    uint16_t id;
+    ItemType type;
+    char name[32];
+    int max_stack;
 
-  char symbol[2];
-  short fg, bg;
-  attr_t attr;
+    char symbol[2];
+    short fg, bg;
+    attr_t attr;
 } ItemDef;
 
 typedef struct {
-  uint16_t id;
-  EntityType type;
-  char name[32];
-  int max_health;
-  bool is_passable;
+    uint16_t id;
+    EntityType type;
+    char name[32];
+    int max_health;
+    bool is_passable;
 
-  char symbol[2];
-  short fg, bg;
-  attr_t attr;
+    char symbol[2];
+    short fg, bg;
+    attr_t attr;
 } EntityDef;
 
 typedef struct {
-  uint16_t id;
-  char name[32];
-  int max_health;
-  bool is_passable;
+    uint16_t id;
+    char name[32];
+    int max_health;
+    bool is_passable;
 
-  char symbol[2];
-  short fg, bg;
-  attr_t attr;
+    char symbol[2];
+    short fg, bg;
+    attr_t attr;
 } ObjectDef;
 
 typedef struct {
-  const ItemDef *def;
-  int quantity;
-  int durability; // Only used if def->type == ITEM_EQUIPMENT
+    const ItemDef *def;
+    int quantity;
+    int durability; // Only used if def->type == ITEM_EQUIPMENT
 } ItemStack;
 
 typedef struct {
-  ItemStack *items;
-  int capacity;
-  int count;
+    ItemStack *items;
+    int capacity;
+    int count;
 } ItemStacks;
 
 typedef struct {
-  const EntityDef *def;
-  char name[32];
-  int health;
-  size_t x, y;
+    const EntityDef *def;
+    char name[32];
+    int health;
+    size_t x, y;
 
-  ItemStacks inventory;
+    ItemStacks inventory;
 } Entity;
 
 typedef struct {
-  Entity **items;
-  size_t count;
-  size_t capacity;
+    Entity **items;
+    size_t count;
+    size_t capacity;
 } Entities;
 
 typedef struct {
-  Elevation elevation;
-  uint16_t object_id;
-  int object_health;
-  Entity *entity;
+    Elevation elevation;
+    uint16_t object_id;
+    int object_health;
+    Entity *entity;
 } MapCell;
 
 typedef struct {
-  size_t w, h;
-  MapCell **cells;
+    size_t w, h;
+    MapCell **cells;
 } Map;
 
 typedef struct {
-  uint32_t seed;
+    uint32_t seed;
 
-  Map *map;
-  Entity *player;
-  Entities entities;
+    Map *map;
+    Entity *player;
+    Entities entities;
 } Game;
 
 const ItemDef *item_get_def(int id);
