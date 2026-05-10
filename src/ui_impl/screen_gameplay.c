@@ -1,7 +1,7 @@
-#include "app_state.h"
-#include "fcp.h"
-#include "log.h"
-#include "save.h"
+#include "ui/app_state.h"
+#include "ui/fcp.h"
+#include "core/log.h"
+#include "core/save.h"
 
 typedef struct {
     char symbol;

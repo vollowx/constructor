@@ -1,6 +1,1 @@
-CompileFlags:
-  Add:
-    - -Wall
-    - -Wextra
-    - -Wno-unused-parameter
-    - -Ithirdparty
+CompilationDatabase: build/

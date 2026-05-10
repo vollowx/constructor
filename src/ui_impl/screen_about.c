@@ -1,6 +1,6 @@
-#include "app_state.h"
-#include "helpers.h"
-#include "log.h"
+#include "ui/app_state.h"
+#include "core/helpers.h"
+#include "core/log.h"
 
 #define ABOUT_HEIGHT 9
 #define ABOUT_WIDTH 60

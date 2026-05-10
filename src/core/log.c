@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "helpers.h"
-#include "log.h"
+#include "core/helpers.h"
+#include "core/log.h"
 
 Logs logs = {0};
 

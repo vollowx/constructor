@@ -4,10 +4,10 @@
 #include <string.h>
 #include <time.h>
 
-#include "game.h"
-#include "helpers.h"
-#include "log.h"
-#include "save.h"
+#include "core/game.h"
+#include "core/helpers.h"
+#include "core/log.h"
+#include "core/save.h"
 
 static void get_path(int slot, char *buf, size_t len) {
     snprintf(buf, len, "save%d.dat", slot);

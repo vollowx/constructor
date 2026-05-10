@@ -1,10 +1,10 @@
 #include <menu.h>
 
-#include "app_state.h"
-#include "fcp.h"
-#include "helpers.h"
-#include "log.h"
-#include "options.h"
+#include "ui/app_state.h"
+#include "ui/fcp.h"
+#include "core/helpers.h"
+#include "core/log.h"
+#include "core/options.h"
 
 #define OPTIONS_HEIGHT 32
 #define OPTIONS_WIDTH 56

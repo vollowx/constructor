@@ -3,8 +3,8 @@
 #include <ncurses.h>
 #include <simplexnoise1234.h>
 
-#include "game.h"
-#include "helpers.h"
+#include "core/game.h"
+#include "core/helpers.h"
 
 // clang-format off
 ItemDef ITEM_DB[] = {

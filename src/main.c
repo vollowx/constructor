@@ -1,13 +1,13 @@
 #include <time.h>
 
-#include "app_state.h"
-#include "fcp.h"
-#include "log.h"
-#include "options.h"
+#include "ui/app_state.h"
+#include "ui/fcp.h"
+#include "core/log.h"
+#include "core/options.h"
 
 #define FPS 60
 
-int main() {
+int main(int argc, char *argv[]) {
     AppContext ctx = {
         .cur_state = (AppState)-1,
         .next_state = APP_STATE_MAIN_MENU,

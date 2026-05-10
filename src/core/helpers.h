@@ -27,9 +27,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "fcp.h"
-#include "log.h"
-#include "options.h"
+#include "ui/fcp.h"
+#include "core/log.h"
+#include "core/options.h"
 
 #define CONSTRUCTOR_VERSION_MAJOR 0
 #define CONSTRUCTOR_VERSION_MINOR 0

@@ -1,9 +1,9 @@
 #include <menu.h>
 
-#include "app_state.h"
-#include "fcp.h"
-#include "helpers.h"
-#include "log.h"
+#include "ui/app_state.h"
+#include "ui/fcp.h"
+#include "core/helpers.h"
+#include "core/log.h"
 
 #define MAIN_MENU_HEIGHT 8
 #define MAIN_MENU_WIDTH 36

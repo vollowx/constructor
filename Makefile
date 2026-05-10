@@ -1,29 +1,27 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -Wno-unused-parameter -Ithirdparty
-LDFLAGS=
-LDLIBS=-lncurses -lmenu
+CFLAGS=-Wall -Wextra -Wpedantic -Wno-unused-parameter -Isrc -Ithirdparty
+LDFLAGS=-lncurses -lmenu
 
-TARGET=constructor
+TARGET=build/constructor
 
-SRC=main.c fcp.c game.c log.c app_state.c options.c save.c \
-    overlay_log.c \
-    screen_main_menu.c \
-    screen_saves.c \
-    screen_gameplay.c \
-    screen_options.c \
-    screen_about.c \
-    thirdparty/simplexnoise1234.c
-OBJ=$(SRC:.c=.o)
+SRC=$(shell find src -name '*.c') thirdparty/simplexnoise1234.c
+OBJ=$(patsubst %.c,build/%.o,$(SRC))
 
-.PHONY: all clean
+.PHONY: all clean compdb
 
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $(LDFLAGS) $(LDLIBS) $(OBJ) -o $@
+	@mkdir -p $(dir $@)
+	$(CC) $(LDFLAGS) $(OBJ) -o $@
 
-%.o: %.c
+build/%.o: %.c
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET)
+	rm -rf build
+
+compdb:
+	@mkdir -p build
+	bear --output build/compile_commands.json -- make all

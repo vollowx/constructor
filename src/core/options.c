@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "log.h"
-#include "options.h"
+#include "core/log.h"
+#include "core/options.h"
 
 #define PATH_OPTIONS "options.txt"
 

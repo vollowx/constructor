@@ -1,10 +1,10 @@
 #include <menu.h>
 
-#include "fcp.h"
-#include "helpers.h"
-#include "app_state.h"
-#include "log.h"
-#include "save.h"
+#include "ui/app_state.h"
+#include "ui/fcp.h"
+#include "core/helpers.h"
+#include "core/log.h"
+#include "core/save.h"
 
 // menu height = 3, padding = 1 * 2, border = 1 * 2
 #define SAVES_HEIGHT 7
