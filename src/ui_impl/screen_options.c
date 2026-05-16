@@ -4,7 +4,7 @@
 #include "core/log.h"
 #include "core/options.h"
 #include "ui/fcp.h"
-#include "ui/state.h"
+#include "ui/tui_context.h"
 
 #define OPTIONS_HEIGHT 32
 #define OPTIONS_WIDTH 56
@@ -93,8 +93,8 @@ void rebuild_options_menu(void) {
     post_menu(o_menu);
 }
 
-void options_init(PrgContext *ctx) {
-    info("[model] major = options");
+void options_init(CwTui *ctx) {
+    info("[model] screen = options");
 
     o_win = newwin(OPTIONS_HEIGHT, OPTIONS_WIDTH, (LINES - OPTIONS_HEIGHT) / 2,
                    (COLS - OPTIONS_WIDTH) / 2);
@@ -108,7 +108,7 @@ void options_deinit(void) {
     free_menu_ctx(o_win, o_menu, o_items, OPTIONS_HEIGHT - 4, false);
 }
 
-void options_input(PrgContext *ctx) {
+void options_input(CwTui *ctx) {
     switch (ctx->ch) {
     case KEY_DOWN:
     case 'j':
@@ -120,7 +120,7 @@ void options_input(PrgContext *ctx) {
         break;
     case 'q':
         options_load();
-        ctx->next_state = APP_STATE_MAIN_MENU;
+        ctx->next_state = TUI_STATE_MAIN_MENU;
         break;
     case 10: {
         ITEM *cur = current_item(o_menu);
@@ -134,10 +134,10 @@ void options_input(PrgContext *ctx) {
             rebuild_options_menu();
         } else if (strcmp(name, "Save") == 0) {
             options_save();
-            ctx->next_state = APP_STATE_MAIN_MENU;
+            ctx->next_state = TUI_STATE_MAIN_MENU;
         } else if (strcmp(name, "Cancel") == 0) {
             options_load();
-            ctx->next_state = APP_STATE_MAIN_MENU;
+            ctx->next_state = TUI_STATE_MAIN_MENU;
         }
         break;
     }
@@ -150,7 +150,7 @@ void options_frame(double dt) {
     wnoutrefresh(o_win);
 }
 
-void options_resize(PrgContext *ctx) {
+void options_resize(CwTui *ctx) {
     if (o_win)
         mvwin(o_win, (LINES - OPTIONS_HEIGHT) / 2, (COLS - OPTIONS_WIDTH) / 2);
 }

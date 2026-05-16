@@ -3,7 +3,7 @@
 #include "core/helpers.h"
 #include "core/log.h"
 #include "ui/fcp.h"
-#include "ui/state.h"
+#include "ui/tui_context.h"
 
 #define MAIN_MENU_HEIGHT 8
 #define MAIN_MENU_WIDTH 36
@@ -13,11 +13,16 @@ ITEM **m_items;
 MENU *m_menu;
 WINDOW *m_win;
 
-void main_menu_init(PrgContext *ctx) {
-    info("[model] major = main_menu");
+void main_menu_init(CwTui *ctx) {
+    info("[model] screen = main_menu");
 
-    char *labels[] = {"Start Game", "Options", "About",
-                      "Quit                         ", (char *)NULL};
+    char *labels[] = {
+        "Start Game",
+        "Options",
+        "About",
+        "Quit                         ",
+        (char *)NULL,
+    };
 
     m_items = (ITEM **)calloc(MAIN_MENU_N_ITEMS + 1, sizeof(ITEM *));
     for (int i = 0; i < MAIN_MENU_N_ITEMS; ++i)
@@ -44,7 +49,7 @@ void main_menu_deinit(void) {
     free_menu_ctx(m_win, m_menu, m_items, MAIN_MENU_N_ITEMS, false);
 }
 
-void main_menu_input(PrgContext *ctx) {
+void main_menu_input(CwTui *ctx) {
     switch (ctx->ch) {
     case KEY_DOWN:
     case 'j':
@@ -55,22 +60,22 @@ void main_menu_input(PrgContext *ctx) {
         menu_driver(m_menu, REQ_UP_ITEM);
         break;
     case 'q':
-        ctx->next_state = APP_STATE_QUIT;
+        ctx->next_state = TUI_STATE_QUIT;
         break;
     case 10: {
         int index = item_index(current_item(m_menu));
         switch (index) {
         case 0:
-            ctx->next_state = APP_STATE_SAVES;
+            ctx->next_state = TUI_STATE_SAVES;
             break;
         case 1:
-            ctx->next_state = APP_STATE_OPTIONS;
+            ctx->next_state = TUI_STATE_OPTIONS;
             break;
         case 2:
-            ctx->next_state = APP_STATE_ABOUT;
+            ctx->next_state = TUI_STATE_ABOUT;
             break;
         case 3:
-            ctx->next_state = APP_STATE_QUIT;
+            ctx->next_state = TUI_STATE_QUIT;
             break;
         }
         break;
@@ -84,6 +89,6 @@ void main_menu_frame(double dt) {
     wnoutrefresh(m_win);
 }
 
-void main_menu_resize(PrgContext *ctx) {
+void main_menu_resize(CwTui *ctx) {
     mvwin(m_win, (LINES - MAIN_MENU_HEIGHT) / 2, (COLS - MAIN_MENU_WIDTH) / 2);
 }

@@ -1,14 +1,14 @@
 #include "core/helpers.h"
 #include "core/log.h"
-#include "ui/state.h"
+#include "ui/tui_context.h"
 
 #define ABOUT_HEIGHT 9
 #define ABOUT_WIDTH 60
 
 WINDOW *a_win;
 
-void about_init(PrgContext *ctx) {
-    info("[model] major = about");
+void about_init(CwTui *ctx) {
+    info("[model] screen = about");
 
     a_win = newwin(ABOUT_HEIGHT, ABOUT_WIDTH, (LINES - ABOUT_HEIGHT) / 2,
                    (COLS - ABOUT_WIDTH) / 2);
@@ -26,10 +26,10 @@ void about_deinit(void) {
     a_win = NULL;
 }
 
-void about_input(PrgContext *ctx) {
+void about_input(CwTui *ctx) {
     switch (ctx->ch) {
     case 'q':
-        ctx->next_state = APP_STATE_MAIN_MENU;
+        ctx->next_state = TUI_STATE_MAIN_MENU;
         break;
     }
 }
@@ -49,7 +49,7 @@ void about_frame(double dt) {
     wnoutrefresh(a_win);
 }
 
-void about_resize(PrgContext *ctx) {
+void about_resize(CwTui *ctx) {
     if (!a_win)
         return;
 

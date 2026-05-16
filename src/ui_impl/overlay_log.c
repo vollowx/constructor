@@ -2,13 +2,13 @@
 #include "core/log.h"
 #include "core/options.h"
 #include "ui/fcp.h"
-#include "ui/state.h"
+#include "ui/tui_context.h"
 
 WINDOW *l_win = NULL;
 static short log_cp[3];
 
-void log_init(PrgContext *ctx) {
-    info("[model] minor += log");
+void log_init(CwTui *ctx) {
+    info("[model] overlay += log");
 
     log_cp[LOG_INFO] = fcp_get(COLOR_BLUE, -1);
     log_cp[LOG_WARNING] = fcp_get(COLOR_YELLOW, -1);
@@ -67,7 +67,7 @@ void log_frame(double dt) {
     wnoutrefresh(l_win);
 }
 
-void log_resize(PrgContext *ctx) {
+void log_resize(CwTui *ctx) {
     if (!l_win)
         return;
 

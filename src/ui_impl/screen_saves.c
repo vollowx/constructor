@@ -4,7 +4,7 @@
 #include "core/log.h"
 #include "core/save.h"
 #include "ui/fcp.h"
-#include "ui/state.h"
+#include "ui/tui_context.h"
 
 // menu height = 3, padding = 1 * 2, border = 1 * 2
 #define SAVES_HEIGHT 7
@@ -18,7 +18,7 @@ static WINDOW *s_win = NULL;
 static WINDOW *s_pre = NULL;
 static SavePreview previews[3];
 
-void rebuild_saves_menu(PrgContext *ctx) {
+void rebuild_saves_menu(CwTui *ctx) {
     if (s_menu) {
         unpost_menu(s_menu);
         free_menu(s_menu);
@@ -53,13 +53,13 @@ void rebuild_saves_menu(PrgContext *ctx) {
     set_menu_mark(s_menu, " > ");
     set_menu_fore(s_menu,
                   COLOR_PAIR(fcp_get(COLOR_BLUE, -1)) | A_BOLD | A_REVERSE);
-    set_current_item(s_menu, s_items[ctx->cur_slot]);
+    set_current_item(s_menu, s_items[ctx->core->cur_slot]);
 
     post_menu(s_menu);
 }
 
-void saves_init(PrgContext *ctx) {
-    info("[model] major = saves");
+void saves_init(CwTui *ctx) {
+    info("[model] screen = saves");
 
     //                          gap
     int total_w = SAVES_WIDTH + 1 + PREVIEW_WIDTH;
@@ -88,12 +88,12 @@ void saves_deinit(void) {
     }
 }
 
-void saves_input(PrgContext *ctx) {
+void saves_input(CwTui *ctx) {
     int slot = item_index(current_item(s_menu));
 
     ITEM *cur = current_item(s_menu);
     if (cur) {
-        ctx->cur_slot = item_index(cur);
+        ctx->core->cur_slot = item_index(cur);
     }
 
     switch (ctx->ch) {
@@ -106,13 +106,13 @@ void saves_input(PrgContext *ctx) {
         menu_driver(s_menu, REQ_UP_ITEM);
         break;
     case 'q':
-        ctx->next_state = APP_STATE_MAIN_MENU;
+        ctx->next_state = TUI_STATE_MAIN_MENU;
         break;
 
     case 10:
     case 'o':
         if (previews[slot].exists) {
-            ctx->next_state = APP_STATE_GAMEPLAY;
+            ctx->next_state = TUI_STATE_GAMEPLAY;
         } else {
             World world = {0};
             world_init(&world);
@@ -204,7 +204,7 @@ void saves_frame(double dt) {
     wnoutrefresh(s_pre);
 }
 
-void saves_resize(PrgContext *ctx) {
+void saves_resize(CwTui *ctx) {
     if (!s_win || !s_pre)
         return;
 

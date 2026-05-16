@@ -3,15 +3,19 @@
 #include "core/log.h"
 #include "core/options.h"
 #include "ui/fcp.h"
-#include "ui/state.h"
+#include "ui/tui_context.h"
 
 #define CW_FPS 60
 
 int main(int argc, char *argv[]) {
-    PrgContext ctx = {
-        .cur_state = (PrgState)-1,
-        .next_state = APP_STATE_MAIN_MENU,
+    Cw core_ctx = {
         .cur_slot = 0,
+    };
+    CwTui ctx = {
+        .cur_state = (CwTuiState)-1,
+        .next_state = TUI_STATE_MAIN_MENU,
+
+        .core = &core_ctx,
     };
 
     initscr();
@@ -40,7 +44,7 @@ int main(int argc, char *argv[]) {
     OVERLAY_MAP(X)
 #undef X
 
-    while (ctx.next_state != APP_STATE_QUIT) {
+    while (ctx.next_state != TUI_STATE_QUIT) {
         clock_gettime(CLOCK_MONOTONIC, &current_frame);
         double dt = (current_frame.tv_sec - last_frame.tv_sec) +
                     (current_frame.tv_nsec - last_frame.tv_nsec) / 1e9;
@@ -54,10 +58,10 @@ int main(int argc, char *argv[]) {
             ctx.cur_state = ctx.next_state;
             switch (ctx.cur_state) {
 #define X(state, suffix)                                                       \
-    case APP_STATE_##state:                                                    \
-        ctx.cur_screen = &screen_##suffix;                                     \
-        break;
-                SCREEN_MAP(X)
+            case TUI_STATE_##state:                                            \
+                ctx.cur_screen = &screen_##suffix;                             \
+                break;
+            SCREEN_MAP(X)
 #undef X
             default:
                 ctx.cur_screen = NULL;
@@ -74,7 +78,7 @@ int main(int argc, char *argv[]) {
             if (ctx.cur_screen)
                 ctx.cur_screen->resize(&ctx);
 #define X(name) name##_resize(&ctx);
-            OVERLAY_MAP(X)
+                OVERLAY_MAP(X)
 #undef X
 
             refresh();
@@ -86,7 +90,7 @@ int main(int argc, char *argv[]) {
         if (ctx.cur_screen)
             ctx.cur_screen->frame(dt);
 #define X(name) name##_frame(dt);
-        OVERLAY_MAP(X)
+            OVERLAY_MAP(X)
 #undef X
 
         doupdate();

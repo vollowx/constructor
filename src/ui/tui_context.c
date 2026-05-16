@@ -1,4 +1,4 @@
-#include "ui/state.h"
+#include "ui/tui_context.h"
 
 #define X(name)                                                                \
     Overlay overlay_##name = {name##_init, name##_frame, name##_resize,        \

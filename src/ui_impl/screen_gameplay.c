@@ -1,7 +1,7 @@
 #include "core/log.h"
 #include "core/save.h"
 #include "ui/fcp.h"
-#include "ui/state.h"
+#include "ui/tui_context.h"
 
 typedef struct {
     char symbol;
@@ -30,8 +30,8 @@ Save current_save = {0};
 bool g_is_first_run = true;
 bool g_need_redraw = true;
 
-void gameplay_init(PrgContext *ctx) {
-    info("[model] major = gameplay");
+void gameplay_init(CwTui *ctx) {
+    info("[model] screen = gameplay");
 
     if (g_is_first_run) {
         current_save.world = &current_world;
@@ -43,8 +43,8 @@ void gameplay_init(PrgContext *ctx) {
         }
     }
 
-    if (save_load(&current_save, ctx->cur_slot) != SAVE_OK) {
-        ctx->next_state = APP_STATE_MAIN_MENU;
+    if (save_load(&current_save, ctx->core->cur_slot) != SAVE_OK) {
+        ctx->next_state = TUI_STATE_MAIN_MENU;
         return;
     }
 
@@ -64,7 +64,7 @@ void gameplay_deinit() {
     g_need_redraw = true;
 }
 
-void gameplay_input(PrgContext *ctx) {
+void gameplay_input(CwTui *ctx) {
     Entity *p = current_save.world->player;
     if (!p)
         return;
@@ -134,7 +134,7 @@ void gameplay_input(PrgContext *ctx) {
                                             current_world.map, 10000, 1, 0);
         break;
     case 'q':
-        ctx->next_state = APP_STATE_SAVES;
+        ctx->next_state = TUI_STATE_SAVES;
         break;
     }
 }
@@ -271,7 +271,7 @@ void gameplay_frame(double dt) {
     g_need_redraw = false;
 }
 
-void gameplay_resize(PrgContext *ctx) {
+void gameplay_resize(CwTui *ctx) {
     if (g_win) {
         wresize(g_win, LINES, COLS);
         mvwin(g_win, 0, 0);
