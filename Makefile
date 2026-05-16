@@ -1,5 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -Wpedantic -Wno-unused-parameter -Isrc -Ithirdparty
+#CFLAGS=-Wall -Wextra -Wpedantic -Wno-unused-parameter -Isrc -Ithirdparty -fsanitize=address
 LDFLAGS=-lncurses -lmenu
 
 TARGET=build/charwild
@@ -13,7 +14,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	@mkdir -p $(dir $@)
-	$(CC) $(LDFLAGS) $(OBJ) -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJ) -o $@
 
 build/%.o: %.c
 	@mkdir -p $(dir $@)

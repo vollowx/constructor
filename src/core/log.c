@@ -23,6 +23,9 @@ void log_message(LogLevel level, const char *fmt, ...) {
 }
 
 void free_logs(void) {
+    da_foreach(Log, it, &logs) {
+        free(it->msg);
+    }
     da_free(logs);
     logs.count = 0;
     logs.capacity = 0;
