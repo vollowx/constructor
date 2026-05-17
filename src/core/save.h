@@ -36,6 +36,7 @@ typedef struct {
 
 SaveResult save_load(Save *save, int slot);
 SaveResult save_save(const Save *save, int slot);
+SaveResult save_delete(int slot);
 void save_init(Save *save);
 
 SavePreview get_slot_preview(int slot);

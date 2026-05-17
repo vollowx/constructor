@@ -129,7 +129,11 @@ void saves_input(CwTui *ctx) {
         break;
 
     case 'x':
+        if (!previews[slot].exists)
+            break;
         // next_state = STATE_SAVE_DELETE
+        save_delete(slot);
+        rebuild_saves_menu(ctx);
         break;
     case 'r':
         if (!previews[slot].exists)

@@ -1,4 +1,2 @@
 build
-save0.dat
-save1.dat
-save2.dat
+**/*.cwsave

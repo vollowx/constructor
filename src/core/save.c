@@ -8,8 +8,18 @@
 #include "core/log.h"
 #include "core/save.h"
 
-static void get_path(int slot, char *buf, size_t len) {
-    snprintf(buf, len, "save%d.dat", slot);
+// TODO: Move to a shared header file
+#define do_defer_and_return(value)                                             \
+    do {                                                                       \
+        ret = (value);                                                         \
+        goto defer;                                                            \
+    } while (0)
+
+char *get_save_path(int slot) {
+    const size_t length = 128;
+    char *buf = malloc(sizeof(char) * length);
+    snprintf(buf, length, "%d.cwsave", slot);
+    return buf;
 }
 
 static SaveResult map_load(Map **map_ptr, FILE *fp) {
@@ -44,8 +54,7 @@ static SaveResult map_load(Map **map_ptr, FILE *fp) {
 }
 
 SaveResult save_load(Save *self, int slot) {
-    char path[128];
-    get_path(slot, path, sizeof(path));
+    char *path = get_save_path(slot);
 
     info("[save] Loading world from %s...", path);
 
@@ -256,29 +265,47 @@ static SaveResult world_save(const World *w, FILE *fp) {
 }
 
 SaveResult save_save(const Save *self, int slot) {
-    char path[128];
-    get_path(slot, path, sizeof(path));
+    SaveResult ret = SAVE_OK;
+    char *path = get_save_path(slot);
 
-    info("[save] Saving to %s...", path);
+    info("[save] Saving slot %d to %s...", slot, path);
 
     FILE *fp = fopen(path, "wb");
     if (!fp) {
         error("[save] Could not open %s for writing", path);
-        return SAVE_ERR_OPEN;
+        do_defer_and_return(SAVE_ERR_OPEN);
     }
 
-    if (fwrite(&self->header, sizeof(SaveHeader), 1, fp) != 1) {
-        fclose(fp);
-        return SAVE_ERR_WRITE;
-    }
+    if (fwrite(&self->header, sizeof(SaveHeader), 1, fp) != 1)
+        do_defer_and_return(SAVE_ERR_WRITE);
 
-    SaveResult res = world_save(self->world, fp);
+    ret = world_save(self->world, fp);
 
+defer:
     fclose(fp);
-    if (res == SAVE_OK)
-        info("[save] Saved successfully", path);
+    free(path);
+    if (ret == SAVE_OK)
+        info("[save] Saved successfully");
+    else
+        error("[save] Failed to save");
+    return ret;
+}
 
-    return res;
+SaveResult save_delete(int slot) {
+    SaveResult ret = SAVE_OK;
+    char *path = get_save_path(slot);
+    if (remove(path) == 0)
+        do_defer_and_return(SAVE_OK);
+    else
+        do_defer_and_return(SAVE_ERR_WRITE);
+
+defer:
+    free(path);
+    if (ret == SAVE_OK)
+        info("[save] Deleted successfully");
+    else
+        error("[save] Failed to delete");
+    return ret;
 }
 
 void save_init(Save *self) {
@@ -290,8 +317,7 @@ void save_init(Save *self) {
 SavePreview get_slot_preview(int slot) {
     SavePreview p = {0};
 
-    char path[128];
-    get_path(slot, path, sizeof(path));
+    char *path = get_save_path(slot);
 
     FILE *fp = fopen(path, "rb");
     if (fp) {
@@ -301,5 +327,6 @@ SavePreview get_slot_preview(int slot) {
         fclose(fp);
     }
 
+    free(path);
     return p;
 }
