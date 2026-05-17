@@ -59,12 +59,12 @@ SaveResult save_save(const Save *self, int slot) {
         do_defer_and_return(SAVE_ERR_OPEN);
 
     fprintf(fp, "@header\n");
-    fprintf(fp, "slot        = %d\n", slot);
-    fprintf(fp, "version     = %u\n", self->header.version);
+    fprintf(fp, "slot = %d\n", slot);
+    fprintf(fp, "version = %u\n", self->header.version);
     fprintf(fp, "player_name = %s\n\n", self->header.player_name);
 
     fprintf(fp, "@world\n");
-    fprintf(fp, "seed      = %u\n", self->world->seed);
+    fprintf(fp, "seed = %u\n", self->world->seed);
     fprintf(fp, "timestamp = %u\n\n", self->header.timestamp);
 
     fprintf(fp, "@map %zu %zu\n", self->world->map->w, self->world->map->h);
@@ -86,7 +86,8 @@ SaveResult save_save(const Save *self, int slot) {
         }
     }
 
-    da_foreach(Entity, ent, &self->world->entities) {
+    da_foreach(Entity *, ent_it, &self->world->entities) {
+        Entity *ent = *ent_it;
         if (!ent || !ent->def)
             continue;
 
@@ -95,10 +96,10 @@ SaveResult save_save(const Save *self, int slot) {
 
         da_foreach(ItemStack, item, &ent->inventory) {
             if (item->def->id >= 30000)
-                fprintf(fp, "@item %u %d %d\n", item->def->id, item->quantity,
+                fprintf(fp, "+ %u %d %d\n", item->def->id, item->quantity,
                         item->durability);
             else
-                fprintf(fp, "@item %u %d\n", item->def->id, item->quantity);
+                fprintf(fp, "+ %u %d\n", item->def->id, item->quantity);
         }
     }
 
@@ -210,8 +211,8 @@ SaveResult save_load(Save *self, int slot) {
             if (strcmp(name, "0") != 0)
                 copy_name(cur_ent->name, sizeof(cur_ent->name), name);
 
-            da_append(&self->world->entities, *cur_ent);
-        } else if (strncmp(line, "@item ", 6) == 0) {
+            da_append(&self->world->entities, cur_ent);
+        } else if (strncmp(line, "+ ", 2) == 0) {
             unsigned int def_id = 0;
             int qty = 0, dur = 0;
             int n;
@@ -219,7 +220,7 @@ SaveResult save_load(Save *self, int slot) {
             if (!cur_ent)
                 do_defer_and_return(SAVE_ERR_READ);
 
-            n = sscanf(line, "@item %u %d %d", &def_id, &qty, &dur);
+            n = sscanf(line, "+ %u %d %d", &def_id, &qty, &dur);
             if (n < 2)
                 do_defer_and_return(SAVE_ERR_READ);
 
@@ -245,7 +246,7 @@ SaveResult save_load(Save *self, int slot) {
 
     self->world->player = NULL;
     for (size_t i = 0; i < self->world->entities.count; ++i) {
-        Entity *ent = &self->world->entities.items[i];
+        Entity *ent = self->world->entities.items[i];
         if (!ent)
             continue;
         if (ent->x >= self->world->map->w || ent->y >= self->world->map->h)

@@ -81,8 +81,8 @@ typedef struct {
 
 typedef struct {
     ItemStack *items;
-    int capacity;
-    int count;
+    size_t count;
+    size_t capacity;
 } ItemStacks;
 
 typedef struct {
@@ -95,7 +95,7 @@ typedef struct {
 } Entity;
 
 typedef struct {
-    Entity *items;
+    Entity **items;
     size_t count;
     size_t capacity;
 } Entities;
