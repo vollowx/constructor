@@ -196,7 +196,7 @@ void world_init(World *w) {
     player->inventory.items =
         malloc(sizeof(ItemStack) * player->inventory.capacity);
 
-    da_append(&w->entities, player);
+    da_append(&w->entities, *player);
     w->player = player;
 
     srand((unsigned int)time(NULL));
@@ -226,8 +226,7 @@ void free_world(World *w) {
         w->map = NULL;
     }
 
-    da_foreach(Entity *, it, &w->entities) {
-        Entity *ent = *it;
+    da_foreach(Entity, ent, &w->entities) {
         if (ent) {
             if (ent->inventory.items) {
                 free(ent->inventory.items);
@@ -296,7 +295,7 @@ void world_gen_area(World *w, size_t y1, size_t x1, size_t y2, size_t x2) {
                                     sizeof(res->name) - 1);
 
                             cell->entity = res;
-                            da_append(&w->entities, res);
+                            da_append(&w->entities, *res);
                         }
                     }
                 }

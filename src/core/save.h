@@ -5,8 +5,7 @@
 
 #include "world.h"
 
-#define SAVE_MAGIC 0x47414D45
-#define SAVE_VERSION 3
+#define SAVE_VERSION 1
 #define MAX_N_SLOTS 3
 
 typedef enum {
@@ -14,11 +13,12 @@ typedef enum {
     SAVE_ERR_OPEN,
     SAVE_ERR_READ,
     SAVE_ERR_WRITE,
-    SAVE_ERR_VERSION
+    SAVE_ERR_VERSION,
+    SAVE_ERR_FORMAT
 } SaveResult;
 
 typedef struct {
-    uint32_t magic;
+    int slot;
     uint32_t version;
     uint32_t timestamp;
     char player_name[32];
